@@ -1,0 +1,293 @@
+﻿@model SIXTReservationApp.Models.ActionSetting.ActionSettingVM
+@{Layout = "_PartialLayout";}
+
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateActionSetting" method="post" asp-controller="ActionSettingManagement" asp-action="CreateActionSetting">
+
+                <input id="actionId" asp-for="Id" hidden />
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Reservation Status</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="resStatusId" asp-for="ReservationStatusId" class="mdb-select" onchange="hideMSG()" Searchable="Search here...">
+                            <option selected disabled>Select Reservation Status</option>
+                        </select>
+
+                        <span asp-validation-for="ReservationStatusId" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Rate Segment Category</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="rateSegCatId" asp-for="RateSegmentCategoryId" onchange="hideMSG()" class="mdb-select" Searchable="Search here...">
+                            <option selected disabled>Select Rate Segment Category</option>
+                        </select>
+                        <span asp-validation-for="RateSegmentCategoryId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus1" class="text-danger" style="display:none;">This field is required</span>
+
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Branch</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="branchesId" asp-for="BranchId" onchange="hideMSG()" class="mdb-select" Searchable="Search here...">
+                            <option selected disabled>Select Branch</option>
+                        </select>
+                        <span asp-validation-for="BranchId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus2" class="text-danger" style="display:none;">This field is required</span>
+
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Weekday</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="weekdayId" asp-for="WeekDayId" onchange="hideMSG()" class="mdb-select" Searchable="Search here...">
+                            <option selected disabled>Select Weekday</option>
+                        </select>
+                        <span asp-validation-for="WeekDayId" cleass="text-danger"></span>
+                        <span id="MsgRequiredStatus3" class="text-danger" style="display:none;">This field is required</span>
+
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Action Step</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="actionStepId" asp-for="ActionStepId" onchange="hideMSG()" class="mdb-select" Searchable="Search here...">
+                            <option selected disabled>Select Branch</option>
+                        </select>
+                        <span asp-validation-for="ActionStepId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus4" class="text-danger" style="display:none;">This field is required</span>
+
+                    </div>
+                </div>
+               
+                <div class="col-6">
+                    <div class="check-list">
+                        <label class="ui-checkbox ui-checkbox-primary">
+                            <input id="checkDisable" type="checkbox" name="IsEnable" checked="" value="false">
+                            <span class="input-span"></span>Is Disabled
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row form-group mt-2 ">
+                    <div class="col-12">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var GR_ReservationStatusId = @Html.Raw(Json.Serialize(Model.ReservationStatusId));
+    var GR_ActionStepId = @Html.Raw(Json.Serialize(Model.ActionStepId));
+    var GR_RateSegmentCategoryId = @Html.Raw(Json.Serialize(Model.RateSegmentCategoryId));
+    var GR_BranchId= @Html.Raw(Json.Serialize(Model.BranchId));
+    var GR_WeekDayId = @Html.Raw(Json.Serialize(Model.WeekDayId));
+    var GR_IsEnable = @Html.Raw(Json.Serialize(Model.IsEnable));
+
+</script>
+@*button click*@
+<script>
+
+
+    $('#CreateActionSetting').ajaxForm(response => {
+        if (!$('#rateSegCatId').val()) {
+            $("#MsgRequiredStatus1").css("display", "inline-block");
+        }
+        if (!$('#branchesId').val()) {
+            $("#MsgRequiredStatus2").css("display", "inline-block");
+        }
+        if (!$('#weekdayId').val()) {
+            $("#MsgRequiredStatus3").css("display", "inline-block");
+        }
+        if (!$('#actionStepId').val()) {
+            $("#MsgRequiredStatus4").css("display", "inline-block");
+        }
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadActionSetting();
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+   
+   
+    
+   
+   
+      function loadReservationStatus() {
+          $('#resStatusId').empty();
+         //$('#RStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node;
+                        if (r.id ==4 )//Open
+                        {
+                            node = $(`<option value=${r.id} selected>${r.status}</option>`);
+                        }
+                        else if (r.id != 4)
+                        {
+                            node2 = $(`<option value=${r.id} disabled>${r.status}</option>`);
+                        }
+                        $('#resStatusId').append(node);
+                        $('#resStatusId').append(node2);
+
+                    });
+                }
+                $('#resStatusId').materialSelect();
+               
+            }
+        });
+    }
+
+   function loadStatusStep(RId)
+    {
+     $('#actionStepId').empty();
+     $('#actionStepId').append('<option class="default" value="" selected disabled>Select Action Step</option>');
+         var Id = $('#rStatusId').val();
+
+        $.ajax({
+            url: '@Url.Action("GetReservationStepByRSId", "Common")',
+            method: 'GET',
+            data: {Id},
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option  value=${r.id} >${r.step}</option>`);
+
+                        $('#actionStepId').append(node);
+                    });
+                }
+                //$('#actionStepId').val(GR_ActionStepId);
+                $('#actionStepId').materialSelect();
+                 $('#actionStepId').val(GR_ActionStepId);
+            }
+        });
+    }
+
+    function loadRateSegmentCategory() {
+        $('#rateSegCatId').empty();
+        $('#rateSegCatId').append('<option class="default" value="" selected disabled>Select Rate Segment Category</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllRateSegementCategory", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#rateSegCatId').append(node);
+                    });
+                }
+                $('#rateSegCatId').materialSelect();
+                $('#rateSegCatId').val(GR_RateSegmentCategoryId);
+            }
+        });
+    }
+
+    function loadBranch()
+    {
+        $('#branchesId').empty();
+        $('#branchesId').append('<option class="default" value="" selected disabled>Select Branch</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllBranches", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#branchesId').append(node);
+                    });
+                }
+                $('#branchesId').materialSelect();
+                $('#branchesId').val(GR_BranchId);
+            }
+        });
+    }
+
+    function loadWeekDay()
+    {
+        $('#weekdayId').empty();
+        $('#weekdayId').append('<option class="default" value="" selected disabled>Select Weekday</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllWeekDays", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#weekdayId').append(node);
+                    });
+                }
+                $('#weekdayId').materialSelect();
+                $('#weekdayId').val(GR_WeekDayId);
+            }
+        });
+    }
+
+    $(() => {
+        loadReservationStatus();
+        loadStatusStep();
+        loadRateSegmentCategory();
+        loadBranch();
+        loadWeekDay();
+
+    })
+    function hideMSG() {
+        if ($('#rateSegCatId').val()) {
+            $("#MsgRequiredStatus1").css("display", "none");
+        }
+        if ($('#branchesId').val()) {
+            $("#MsgRequiredStatus2").css("display", "none");
+        }
+        if ($('#weekdayId').val()) {
+            $("#MsgRequiredStatus3").css("display", "none");
+        }
+        if ($('#actionStepId').val()) {
+            $("#MsgRequiredStatus4").css("display", "none");
+        }
+    }
+
+</script>
+
+

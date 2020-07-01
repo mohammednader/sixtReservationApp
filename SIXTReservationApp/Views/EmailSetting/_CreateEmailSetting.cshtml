@@ -1,0 +1,67 @@
+﻿@model SIXTReservationBL.Models.ViewModels.EmailSettingVM
+@{Layout = "_PartialLayout";}
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateEmailSetting" autocomplete="off" enctype="multipart/form-data" asp-controller="EmailSetting" asp-action="CreateEmailSetting">
+                <div class="row">
+                    <input id="EmailSettingId" asp-for="Id" hidden />
+                    <div class="col-sm-12 form-group">
+                        <label><b>Reservation Status</b></label><span id="Redasterisks"> *</span>
+                        <select asp-for="ReservationStatus"  class="mdb-select">
+                            <option  disabled>Select Reservation Status</option>
+                            <option selected value="4">Open</option>
+                            @*<option value="5">Invoiced</option>*@
+
+                        </select>
+                        <span asp-validation-for="ReservationStatus" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label><b>Email Text</b></label><span id="Redasterisks"> *</span>
+                        <textarea asp-for="EmailText" class="form-control" type="text" placeholder="Email Text here .." required>@Model.EmailText</textarea>
+                        <span asp-validation-for="EmailText" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@*button click*@
+<script>
+
+    $('#CreateEmailSetting').ajaxForm(response => {
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadEmailSettings()
+
+
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+</script>

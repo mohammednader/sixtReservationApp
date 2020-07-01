@@ -1,0 +1,247 @@
+﻿@model SIXTReservationApp.Models.CByCustomerReservation.FormSubmitVM
+
+<div class="check-list">
+    <label class="ui-radio ui-radio-primary">
+        <input class="selectOption" type="radio" value="true" asp-for="@Model.IsOpenConfirm">
+        <span class="input-span"></span>Response
+    </label>
+    <label class="ui-radio ui-radio-primary">
+        <input class="selectOption" type="radio" value="false" asp-for="@Model.IsOpenConfirm">
+        <span class="input-span"></span>No Response
+    </label>
+</div>
+
+<div id="DenyDiv" style="display:none">
+    <form id="formSubmit_NoResponse">
+
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Reason</b></label>
+                <select id="reasonDDL" asp-for="@Model.ReasonId" class="form-control validate" required>
+                    <option selected disabled>Select Reason</option>
+                </select>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+            </div>
+        </div>
+
+        <div class="ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="formSubmit_NoResponse()">Submit</button>
+        </div>
+    </form>
+</div>
+<div id="AnswerDiv" style="display:none">
+
+    <div class="row ml-5">
+        <div class="col-6  form-group">
+            <label><b>Answer</b></label>
+            <select id="AnswerDDL" asp-for="@Model.CancelBy" class="form-control validate" required>
+                <option value="0" selected disabled>Select Answer</option>
+                <option value="1">Cancel By Customer</option>
+                <option value="2">Cancel By Sixt</option>
+                <option value="3">Confirm</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div id="CancelDiv" style="display:none">
+    <form id="formSubmitCancelByCustomer">
+        @*<div class="row ml-5">
+                <div class="col-6 form-group">
+                    <label><b>Status</b></label>
+                    <select id="statusDDL" asp-for="@Model.ReasonStatus" class="form-control validate" onchange="changeReason()" required>
+                        <option selected disabled>status</option>
+                        <option value="true">Answer</option>
+                        <option value="false">No Answer</option>
+                    </select>
+
+                </div>
+            </div>*@
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Reason</b></label>
+                <select id="reasons" asp-for="@Model.ReasonId" class="form-control validate" required>
+                    <option selected disabled>Select Reason</option>
+                </select>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+            </div>
+        </div>
+
+        <div class="ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="formSubmitCancelByCustomer()">Submit</button>
+        </div>
+    </form>
+</div>
+<div id="CancelBySixtDiv" style="display:none">
+    <form id="formSubmitCancelBySixt">
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Reason</b></label>
+                <select id="reasonCBySixt" asp-for="@Model.ReasonId" class="form-control validate" required>
+                    <option selected disabled>Select Reason</option>
+                </select>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+            </div>
+        </div>
+
+        <div class="ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="formSubmitCancelBySixt()">Submit</button>
+        </div>
+    </form>
+</div>
+<div id="ConfirmDiv" style="display:none">
+    <div class="alert alert-light d-flex flex-column align-items-center " role="alert">
+        <form id="formSubmitConfirm">
+            <div style="text-align:left">
+                <h2 class="alert-heading">Confirmation</h2>
+                <p>Are you sure to confirm this reservation</p>
+
+                <div class="form-group">
+                    <label><b>Comment</b></label>
+                    <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+                </div>
+
+            </div>
+            <div>
+                <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-12" onclick="formSubmitConfirmed()">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(() => {
+        LoadReasons();
+        $('#AnswerDDL').change(function () {
+            if (this.value == 3)// confirmed
+            {
+                $("#CancelBySixtDiv").css('display', 'none');
+                $("#CancelDiv").css('display', 'none');
+                $("#ConfirmDiv").css('display', 'inline');
+            }
+            else if (this.value == 1)//cancel by customer
+            {
+                $("#CancelDiv").css('display', 'inline');
+                $("#ConfirmDiv").css('display', 'none');
+                $("#CancelBySixtDiv").css('display', 'none');
+                changeReason();
+
+            }
+            else if (this.value == 2)//cancel by sixt
+            {
+                $("#CancelDiv").css('display', 'none');
+                $("#ConfirmDiv").css('display', 'none');
+                $("#CancelBySixtDiv").css('display', 'inline');
+                LoadReason();
+            }
+
+        })
+
+        $('input[type=radio][name=IsOpenConfirm]').change(function () {
+            if (this.value == 'true')
+            {
+                $("#DenyDiv").css('display', 'none');
+                $("#AnswerDiv").css('display', 'inline');
+                $("#CancelDiv").css('display', 'none');
+                $("#ConfirmDiv").css('display', 'none');
+            }
+            else if (this.value == 'false')
+            {
+                $("#AnswerDDL").val("0");
+                $("#AnswerDiv").css('display', 'none');
+                $("#DenyDiv").css('display', 'inline');
+                $("#CancelDiv").css('display', 'none');
+                $("#ConfirmDiv").css('display', 'none');
+
+            }
+        });
+    })
+
+  function LoadReason()
+    {
+      $('#reasonCBySixt').empty();
+      $('#reasonCBySixt').append('<option selected disabled > select Reason</option>');
+      var isAnswer = false;
+      console.log(isAnswer);
+        $.ajax({
+            url: '@Url.Action("GetReasonForCBySixt", "Reservation")',
+            method: 'GET',
+            data: { isAnswer},
+            success: response => {
+                console.log(response);
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#reasonCBySixt').append(node);
+                    });
+                }
+
+
+            }
+        });
+    }
+
+
+    function changeReason()
+    {
+      $('#reasons').empty();
+        $('#reasons').append('<option selected disabled > select Reason</option>');
+        var isAnswer = true;
+        $.ajax({
+            url: '@Url.Action("GetCByCustomerFormSubmit", "Reservation")',
+            method: 'GET',
+            data: { isAnswer},
+            success: response => {
+                console.log(response);
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#reasons').append(node);
+                    });
+                }
+
+
+            }
+        });
+    }
+
+     function LoadReasons()
+    {
+      $('#reasonDDL').empty();
+      $('#reasonDDL').append('<option selected disabled > select Reason</option>');
+      var isAnswer = false;
+      console.log(isAnswer);
+        $.ajax({
+            url: '@Url.Action("GetOpenReasonsFormSubmit", "Reservation")',
+            method: 'GET',
+            data: { isAnswer},
+            success: response => {
+                console.log(response);
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#reasonDDL').append(node);
+                    });
+                }
+
+
+            }
+        });
+    }
+
+</script>
+

@@ -1,0 +1,369 @@
+﻿@model SIXTReservationApp.Models.ActionSetting.ActionSettingVM
+@{
+    ViewData["Title"] = "Action Setting Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+     <div class="d-flex mb-2 mt-1 justify-content-end">
+        <button class="btn btn-primary btn-md mr-0" onclick="Create()">
+            <b>Add Action Setting</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+        </button>
+    </div>
+    <div class="ibox">
+        <div class="ibox-head">
+            <div class="ibox-title">Search</div>
+            <div class="ibox-tools">
+                <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+                <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+            </div>
+        </div>
+        <div class="ibox-body">
+            <form id="searchActionSetting" class="form-horizontal">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label font-weight-bold">Reservation Status</label>
+                    <label class="col-4 col-form-label font-weight-bold">Rate Segment Category</label>
+                    <label class="col-4 col-form-label font-weight-bold">Branch</label>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <select id="rStatusId" asp-for="ReservationStatusId" class="mdb-select">
+                            <option class="default" selected>Select Reservation Status</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select id="rateSCId" asp-for="RateSegmentCategoryId" class="mdb-select" Searchable="Search here...">
+                            <option class="default" selected>Select Segment Category</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select id="branchId" asp-for="BranchId" class="mdb-select" Searchable="Search here...">
+                            <option class="default" selected>Select Branch</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-4 col-form-label font-weight-bold">WeekDay</label>
+                    <label class="col-4 col-form-label font-weight-bold">Action Step</label>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <select id="weekDayId" asp-for="WeekDayId" class="mdb-select" Searchable="Search here...">
+                            <option class="default" selected>Select WeekDay</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select id="actionStatusId" asp-for="ActionStepId" class="mdb-select" Searchable="Search here...">
+                            <option class="default" selected>Select Action Step</option>
+                        </select>
+                    </div>
+
+                    <div class="col-4">
+                        <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                        <button type="button" id="resetBTN" onclick="clearForm(this)" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                            Cancel 
+                        </button>
+
+                    </div>
+
+                </div>
+                
+            </form>
+        </div>
+    </div>
+ 
+    <div id="DivActionSetting">
+
+
+    </div>
+ <!--Create Modal -->
+<div class="modal fade" id="CreateActionSettingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateActionSettingModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="col-12">
+
+                <div id="resultCreate">
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Edite Modal -->
+
+<div class="modal fade" id="editActionSettingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editActionSettingModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="result">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+     function loadReservationStatus() {
+         $('#rStatusId').empty();
+         //$('#RStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node;
+                        if (r.id == 4 )//Open
+                        {
+                            node = $(`<option value=${r.id} selected >${r.status}</option>`);
+                        }
+                        else if (r.id != 4)
+                        {
+                            node2 = $(`<option value=${r.id} disabled>${r.status}</option>`);
+                        }
+                        $('#rStatusId').append(node);
+                        $('#rStatusId').append(node2);
+                       
+                    });
+                }
+                //$('#RStatusId').materialSelect();
+                loadActionStep();
+
+            }
+        });
+    }
+
+    function loadActionStep() {
+        $('#actionStatusId').empty();
+        $('#actionStatusId').append('<option class="default" value="" selected disabled>Select Action Step</option>');
+        var Id = $('#rStatusId').val();
+        $.ajax({
+            url: '@Url.Action("GetReservationStepByRSId", "Common")',
+            method: 'GET',
+            data: {Id},
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.step}</option>`);
+                        $('#actionStatusId').append(node);
+                    });
+                }
+               $('#actionStatusId').materialSelect();
+            }
+        });
+    }
+
+     function loadRateSegmentCategory() {
+         $('#rateSCId').empty();
+         $('#rateSCId').append('<option class="default" value="" selected disabled>Select Rate Segment Category</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllRateSegementCategory", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#rateSCId').append(node);
+                    });
+                }
+
+            }
+        });
+    }
+
+     function loadBranch() {
+         $('#branchId').empty();
+         $('#branchId').append('<option class="default" value="" selected disabled>Select Branch</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllBranches", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#branchId').append(node);
+                    });
+                }
+
+            }
+        });
+    }
+
+     function loadWeekDay() {
+         $('#weekDayId').empty();
+         $('#weekDayId').append('<option class="default" value="" selected disabled>Select Weekday</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllWeekDays", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.name}</option>`);
+                        $('#weekDayId').append(node);
+                    });
+                }
+
+            }
+        });
+    }
+
+    function loadActionSetting(e) {
+        $('#CreateActionSettingModal').modal('hide'); $('#editActionSettingModal').modal('hide');
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#searchActionSetting').serialize();
+
+        $.ajax({
+            url: '@Url.Action("_ActionSettingList")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivActionSetting').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+
+
+
+</script>
+
+@* create*@
+<script>
+
+    function Create() {
+
+        $.ajax({
+            url: '@Url.Action("CreateActionSetting", "ActionSettingManagement")',
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                $('#resultCreate').html(data);
+                $('#CreateActionSettingModalTitle').text("Create Action Setting");
+                $('#CreateActionSettingModalTitle').css("text-align", "center");
+                $('#CreateActionSettingModal').modal('show');
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+
+    }
+
+</script>
+@*edit*@
+<script>
+
+    function Edit(id) {
+        $.ajax({
+            url: '@Url.Action("UpdateActionSetting", "ActionSettingManagement")',
+            data: { id },
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                console.log(data);
+                $('#result').html('');
+                $('#resultCreate').html('');
+                $('#result').html(data);
+                // Model Binding with data
+              
+                if (GR_IsEnable == true) {
+                    $('#checkDisable').prop('checked', false);
+                }
+
+
+                 $('#editActionSettingModalTitle').text("Update Action Setting");
+                $('#CreateActionSetting').attr('action', '@Url.Action("UpdateActionSetting")');
+                 $('#btnSubmit').html('Update');
+                 $('#btnSubmit').removeClass("btn-primary");
+                 $('#btnSubmit').addClass("btn-success");
+                 $('#editActionSettingModal').modal('show');
+
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+    }
+
+</script>
+@*Delete*@
+<script>
+     async function Delete(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to delete this Action setting?',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeleteActionSetting")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadActionSetting();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to Delete Action setting',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+<script>
+    $(() => {
+        loadReservationStatus();
+        loadActionSetting();
+        loadRateSegmentCategory();
+        loadBranch();
+        loadWeekDay();
+        $('#searchActionSetting').on('submit', loadActionSetting);
+
+    })
+    function clearForm(e) {
+        $('#searchActionSetting')[0].reset();
+        $('.default').prop('selected', true);
+        loadActionSetting();
+    }
+
+</script>
+
+
+
+
+

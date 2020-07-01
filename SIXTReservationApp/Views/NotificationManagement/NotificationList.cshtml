@@ -1,0 +1,177 @@
+﻿
+@{
+    ViewData["Title"] = "All Notification";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="ibox">
+    <div class="ibox-head">
+        <div class="ibox-title">Search</div>
+        <div class="ibox-tools">
+            <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+            <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+        </div>
+    </div>
+    <div class="ibox-body">
+        <form id="searchNotification" class="form-horizontal">
+            <div class="form-group row">
+                <label class="col-4 col-form-label font-weight-bold">Date Range</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <input type="hidden" id="hfBookingDtFrom" name="BookingDateFrom" />
+                    <input type="hidden" id="hfBookingDtTo" name="BookingDateTo" />
+                    <input id="calBookingDtRange" class="form-control" autocomplete="off" />
+                </div>
+               
+            </div>
+
+
+            <div class="form-group row">
+                <div class="col-12">
+                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                    <button type="button" id="resetBTN" onclick="clearSearch()" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="DivNotification">
+
+
+</div>
+
+<script>
+    async function initDateRange() {
+        $('#calBookingDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+                'years': 1,
+            },
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfBookingDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfBookingDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+        }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfBookingDtFrom').val('');
+            $('#hfBookingDtTo').val('');
+        });
+
+        $('#calPickUpDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+                'years': 1,
+            },
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfPickUpDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfPickUpDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+        }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfPickUpDtFrom').val('');
+            $('#hfPickUpDtTo').val('');
+        });
+
+        $('#calCancelDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+                'years': 1,
+            },
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfCancelDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfCancelDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+        }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfCancelDtFrom').val('');
+            $('#hfCancelDtTo').val('');
+        });
+
+
+    }
+
+     function loadNotification(e) {
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#searchNotification').serialize();
+
+        $.ajax({
+            url: '@Url.Action("AllNotification")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivNotification').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+
+    $(() => {
+
+        initDateRange();
+        loadNotification();
+        $('#searchNotification').on('submit', loadNotification);
+
+    })
+    function clearSearch() {
+        $('#searchNotification')[0].reset();
+        $('#hfBookingDtFrom').val('');
+        $('#hfBookingDtTo').val('');
+        loadNotification();
+    }
+</script>

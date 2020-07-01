@@ -1,0 +1,32 @@
+﻿@model SIXTReservationApp.Models.CByCustomerReservation.CustomerModel
+
+<div>
+    @if (Model !=null)
+    {
+        <div class="row">
+            <!-- step conetnt -->
+            <div class="md-form col-6 m-5">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <td class="font-weight-bold">Name</td>
+                            <td class="font-weight-bold">Email</td>
+                            <td class="font-weight-bold">Phone</td>
+                            <td class="font-weight-bold">Comment</td>
+                        </tr>
+                    </thead>
+                        <tr>
+                            <td>@Model.Name</td>
+                            <td>@Model.Email</td>
+                            <td>@Model.Phone</td>
+                            <td>@Model.Comment</td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+
+    }
+</div>

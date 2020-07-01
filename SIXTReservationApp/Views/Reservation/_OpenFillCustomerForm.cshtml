@@ -1,0 +1,87 @@
+﻿@model SIXTReservationApp.Models.CByCustomerReservation.CustomerModel
+
+<div>
+    <form id="customerForm">
+
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Email</b></label>
+                <input type="email" asp-for="Email" class="form-control validate" required />
+                <span  asp-validation-for="Email" class="text-danger msgError"></span>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Phone</b></label>
+                <input  asp-for="Phone" class="form-control validate" required />
+                <span  asp-validation-for="Phone" class="text-danger msgError"></span>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea asp-for="@Model.Comment" class="form-control">@Model.Comment </textarea>
+            </div>
+        </div>
+
+        <div class="step-actions ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light next-step ml-5" onclick="formSubmit_CustomerForm()">Submit</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script>
+    $(() => {
+
+        
+        $('#customerForm').validate({
+                errorClass: 'help-block animation-slideDown', // You can change the animation class for a different entrance animation - check animations page  
+                errorElement: 'div',
+                errorPlacement: function (error, e) {
+                    e.parents('.form-group > div').append(error);
+                },
+                highlight: function (e) {
+
+                    $(e).closest('.form-group').removeClass('has-success has-error').addClass('has-error');
+                    $(e).closest('.help-block').remove();
+                },
+                success: function (e) {
+                    e.closest('.form-group').removeClass('has-success has-error');
+                    e.closest('.help-block').remove();
+                },
+                rules: {
+                    'Email': {
+                        required: true,
+                        email: true
+                    },
+
+                    'Phone': {
+                        required: true,
+                        minlength: 4
+                    },
+
+                   
+                },
+                messages: {
+                    'Email': 'Please enter valid email address',
+
+                    'Phone': {
+                        required: 'Please enter valid phone ',
+                        minlength: 'Your phone number must be at least 4 number'
+                    },
+
+                   
+                }
+            });
+        
+
+
+    })
+</script>
+
+
+

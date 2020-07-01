@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="background">
+    <img src="~/images/2.jpg" style="background-size: cover; width:100% ; height:100% ; background-size: 100%;" />
+</div>
+
+<style>
+    .background {
+        background: red;
+    }
+
+    .page-content {
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+
+    .content-wrapper {
+        padding: 0 !important;
+        min-height: initial;
+    }
+
+    .background img {
+        padding: 25px;
+        padding-right:195px;
+        margin-left: -10px;
+        margin-top: 27px;
+    }
+    
+</style>
+
+<script>
+    $(window).resize(function () {
+        $('.background').height($(window).height());
+        $('.background').width($(window).width());
+    })
+    $(document).ready(function () {
+        $(window).resize(function () {
+            $('.background').height($(window).height());
+            $('.background').width($(window).width());
+        })
+        $('.background').height($(window).height());
+        $('.background').width($(window).width());
+        $('.NotificationBar').addClass('DisNone');
+    })
+</script>

@@ -1,0 +1,51 @@
+﻿@model List<SIXTReservationApp.Models.CByCustomerReservation.UserNotifications>
+
+         <!-- step conetnt -->
+        <div class="md-form col-6 m-5">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="font-weight-bold">
+                        <td class="font-weight-bold">Name</td>
+                        <td class="font-weight-bold">Email</td>
+                        <td class="font-weight-bold"> Notified Date</td>
+                    </tr>
+                </thead>
+                @if (Model?.Count > 0)
+                {
+
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+
+                        var item = Model[i];
+                        <tr>
+                            <td>@item.UserName</td>
+                            <td>@item.Email</td>
+                            <td>@item.NotifiedDate</td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+
+                    <tr> <td colspan="3"> No notification send </td> </tr>
+
+                }
+            </table>
+        </div>
+
+        <!-- step confirmation -->
+    
+    <div class="step-actions">
+        <input hidden value="@ViewBag.ReservationId" id="reservationId" />
+        <input hidden value="@ViewBag.CurrentStep" id="currentStep" />
+    </div>
+ 
+
+
+
+
+
+
+
+

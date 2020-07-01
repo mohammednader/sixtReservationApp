@@ -1,0 +1,140 @@
+﻿
+@{
+    ViewData["Title"] = "Email Setting Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex mb-2  justify-content-end">
+    <button class="btn btn-primary btn-md mr-0" onclick="Create()">
+        <b>Add Email Setting</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+    </button>
+</div>
+
+<!--Create Modal -->
+<div class="modal fade" id="CreateEmailSettingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateEmailSettingModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="resultCreate">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Edite Modal -->
+
+<div class="modal fade" id="editEmailSettingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmailSettingModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="result">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="DivEmailSetting">
+
+</div>
+
+
+
+    @* create*@
+<script>
+
+
+
+    function Create() {
+
+        $.ajax({
+            url: '@Url.Action("CreateEmailSetting", "EmailSetting")',
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $('#resultCreate').html(data);
+                $('#CreateEmailSettingModalTitle').text("Create Email Setting");
+                $('#CreateEmailSettingModalTitle').css("text-align", "center")
+                $('#CreateEmailSettingModal').modal('show');
+                $('#ReservationStatus').materialSelect();
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+
+    }
+
+</script>
+@*edit*@
+<script>
+
+    function Edit(id) {
+        $.ajax({
+            url: '@Url.Action("UpdateEmailSetting", "EmailSetting")',
+            data: { id },
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $('#result').html('');
+                $('#resultCreate').html('');
+                 $('#result').html(data);
+                 $('#editEmailSettingModalTitle').text("Update Email Setting");
+                 $('#CreateEmailSetting').attr('action', '@Url.Action("UpdateEmailSetting")');
+                 $('#btnSubmit').html('Update');
+                 $('#btnSubmit').removeClass("btn-primary");
+                 $('#btnSubmit').addClass("btn-success");
+                 $('#editEmailSettingModal').modal('show');
+                $('#ReservationStatus').materialSelect();
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+    }
+
+</script>
+
+<script>
+    $(() => {
+        loadEmailSettings();
+       
+    })
+    function loadEmailSettings(e) {
+        $('#CreateEmailSettingModal').modal('hide'); $('#editEmailSettingModal').modal('hide');
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        $.ajax({
+            url: '@Url.Action("_EmailSettingList")',
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivEmailSetting').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+</script>
+

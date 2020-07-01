@@ -1,0 +1,481 @@
+﻿
+@{
+    ViewData["Title"] = "Open Reservations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="ibox mt-2">
+    <div class="ibox-head">
+        <div class="ibox-title">Search</div>
+        <div class="ibox-tools">
+            <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+            <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+        </div>
+    </div>
+    <div class="ibox-body">
+        <form id="formSearchOpen" class="form-horizontal">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label class="font-bold">Reservation Number</label>
+                    <input class="form-control" type="text" name="ReservationNum" id="ReservationNum" placeholder="Reservation Number">
+                </div>
+
+                <div class="col-4">
+                    <div class="form-group">
+                        <label class="font-bold">Booking Date Range</label>
+                        <input type="hidden" id="hfBookingDtFrom" name="BookingDateFrom" />
+                        <input type="hidden" id="hfBookingDtTo" name="BookingDateTo" />
+                        <input id="calBookingDtRange" class="form-control" autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <label class="font-bold">PickUp Date Range</label>
+                    <input type="hidden" id="hfPickUpDtFrom" name="PickUpDateFrom" />
+                    <input type="hidden" id="hfPickUpDtTo" name="PickUpDateTo" />
+                    <input id="calPickUpDtRange" class="form-control" autocomplete="off" />
+
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Cancellation Date Range</label>
+                    <input type="hidden" id="hfCancelDtFrom" name="CancelDateFrom" />
+                    <input type="hidden" id="hfCancelDtTo" name="CancelDateTo" />
+                    <input id="calCancelDtRange" class="form-control" autocomplete="off" />
+
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Pick Up Branch(s)</label>
+                    <select name="PickUpBranchIds" id="PickUpBranchIds" class="mdb-select" multiple Searchable="Search here...">
+                        <option class="default" value="" selected>Select One</option>
+                    </select>
+
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Customer Name</label>
+                    <input class="form-control" type="text" name="CustomerName" id="CustomerName" placeholder="Customer Name">
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Cancelled After Booking In Day(s)</label>
+                    <input type="number" class="form-control " id="CancelledAfterBookingDays" name="CancelledAfterBookingDays" min="0" />
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Rental Days</label>
+                    <input type="number" class="form-control " id="RentalDays" name="RentalDays" min="0" />
+                </div>
+                <div class="col-4">
+                    <label class="font-bold">Reservation Actions</label>
+                    <select name="ActionStepId" id="ActionStepId" class=" form-control">
+                        <option class="default" value="" selected>Select One  </option>
+                        <option value="19">Need Assignment(BM)</option>
+                        <option value="20">Notified but no Assignment(BM)  </option>
+                        <option value="21">Assigned but no form submitted (BM) </option>
+                        @*<option value="4">Need Sumbission Action  </option>*@
+                        <option value="23">Assigned To Me (BM) </option>
+                        <option value="24">Need Assignment(CC) </option>
+                        <option value="25">Notified but no Assignment(CC)  </option>
+                        <option value="26">Assigned but no form submitted (CC) </option>
+                        @*<option value="4">Need Sumbission Action  </option>*@
+                        <option value="28">Assigned To Me (CC) </option>
+                        <option value="31">Need Assignment(BM) Confirmed</option>
+                        <option value="32">Notified but no Assignment(BM) Confirmed </option>
+                        <option value="33">Assigned but no form submitted (BM) Confirmed</option>
+                        @*<option value="4">Need Sumbission Action  </option>*@
+                        <option value="35">Assigned To Me (BM) Confirmed</option>
+                    </select>
+                </div>
+                @*<div class="col-4">
+                        <label class="ui-checkbox">
+                            <input type="checkbox" class="form-control" id="AssignedToMe" name="AssignedToMe">
+                            <span class="input-span"></span>Assigned to me
+                        </label>
+
+                    </div>*@
+            </div>
+
+            <div class="form-group row">
+                <div class="col-12">
+                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                    <button type="reset" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" onclick="clearSearch()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="divOpen">
+
+</div>
+<div class="modal fade" id="MultiAssignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content p-3">
+
+            <div id="AssignModalBody">
+                <div class="page-content fade-in-up">
+                    <div class="ibox">
+                        <div class="ibox-body p-2">
+                            <label>Select Agent</label>
+                            <div class="row">
+
+                                <div class="col-8 mt-1">
+                                    <select id="assignDDL" class="form-control  select-dropdown validate col-12" Searchable="Search here..." required>
+                                        <option selected disabled>select user</option>
+                                    </select>
+                                    <span style="color:red" id="assingUserError"></span>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="assignAgent()">Assign</button>
+
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/pagination.js"></script>
+<script>
+    /*pagination*/
+    var tableLength = 10;
+    function SetSize()
+    {
+        tableLength = $('#tableRowCount').val();
+        setPageSize(tableLength);
+        page = 1;
+        loadList();
+
+    }
+
+        function next() {
+            page += 1;
+            loadList();
+        }
+        function prev() {
+            page -= 1;
+            loadList();
+        }
+
+    function loadList(e) {
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#formSearchOpen').serialize();
+        form += `&page=${page}&pageSize=${pageSize}`;
+        $.ajax({
+            url: '@Url.Action("_OpenList")?' + form ,
+            method: 'GET',
+            success: response => {
+            if (response) {
+                $('#divOpen').html(response);
+                $('#tableRowCount').val(tableLength);
+            //$('#CByCustomerTable').dataTable();
+            }
+            else {
+            Swal.fire({
+            icon: 'error',
+            text: 'Failed to load roles',
+            });
+            }
+            }
+            });
+            }
+
+    async function getAllBranches() {
+            $('#PickUpBranchIds').empty();
+            $('#PickUpBranchIds').append('<option class="default" value="" selected disabled>Select Branch</option>');
+
+            $.ajax({
+            url: '@Url.Action("GetAllBranches", "Common")',
+            method: 'GET',
+            success: response => {
+            if (response && response.length) {
+            response.forEach(j => {
+            $('#PickUpBranchIds').append(`<option value="${j.id}">${j.name}</option>`);
+            });
+            }
+            }
+            });
+            }
+
+
+    async function initDateRange() {
+            $('#calBookingDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+            'years': 1,
+            },
+            locale: {
+            cancelLabel: 'Clear',
+            format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+            }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfBookingDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfBookingDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+            }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfBookingDtFrom').val('');
+            $('#hfBookingDtTo').val('');
+            });
+
+            $('#calPickUpDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+            'years': 1,
+            },
+            locale: {
+            cancelLabel: 'Clear',
+            format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+            }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfPickUpDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfPickUpDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+            }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfPickUpDtFrom').val('');
+            $('#hfPickUpDtTo').val('');
+            });
+
+            $('#calCancelDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+            'years': 1,
+            },
+            locale: {
+            cancelLabel: 'Clear',
+            format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+            }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfCancelDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfCancelDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+            }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfCancelDtFrom').val('');
+            $('#hfCancelDtTo').val('');
+            });
+
+
+            }
+
+    function reset() {
+            $('#calPickUpDtRange').val('');
+            $('#hfPickUpDtFrom').val('');
+            $('#hfPickUpDtTo').val('');
+
+            $('#calCancelDtRange').val('');
+            $('#hfCancelDtFrom').val('');
+            $('#hfCancelDtTo').val('');
+
+            $('#calBookingDtRange').val('');
+            $('#hfBookingDtFrom').val('');
+            $('#hfBookingDtTo').val('');
+
+            $('#ReservationNum').val('');
+            $('#PickUpBranchIds').val('');
+            $('#CancelledBeforePickUpInDays').val('');
+            $('#ActionStepId').val('');
+            }
+
+    function clearSearch() {
+            reset();
+            loadList();
+            }
+
+    async function loadUsers()
+            {
+            $('#assignDDL').empty();
+            $('#assignDDL').append('<option selected disabled> select user</option>');
+
+            $.ajax({
+            url: '@Url.Action("GetOpenAssignAnyUsers", "Reservation")',
+            method: 'GET',
+            success: response => {
+            if (response && response.length) {
+            response.forEach(r => {
+            var node = $(`<option value=${r.id}>${r.name}</option>`);
+            $('#assignDDL').append(node);
+            });
+            }
+
+            }
+            });
+            }
+
+    async function exportReservation()
+      {
+        var form = $("#formSearchOpen").serialize();
+            var now = moment().format();
+            fetch('@Url.Action("OpenExportReservation")?'+form, {
+            method: 'get',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            }).then(response => {
+            return response.blob();
+            }).then(blob => {
+            if (!blob) {
+            swal.fire({
+            icon: 'error',
+            text: 'No file to download',
+            });
+            return;
+            } else if (!blob.size){
+            swal.fire({
+            icon: 'error',
+            text: 'You don\'t have permission',
+            });
+            return;
+            }
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `Reservation_${now}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            }).catch(err => {
+            swal.fire({
+            icon: 'error',
+            text: 'An error occured',
+            });
+            });
+            }
+
+    async function ShowAgentAssignmentModal() {
+            $('#assingUserError').text('');
+            $('#MultiAssignModal').modal('show');
+
+            var selectedTaskIDs = new Array();
+            $('input:checkbox.RowChk').each(function () {
+            if ($(this).prop('checked')) {
+            selectedTaskIDs.push($(this).val());
+            }
+            });
+            console.log(selectedTaskIDs);
+
+
+    }
+
+    async function assignAgent()
+            {
+            $('#assingUserError').text('');
+            var selectedTaskIDs = new Array();
+            $('input:checkbox.RowChk').each(function () {
+            if ($(this).prop('checked')) {
+            selectedTaskIDs.push($(this).val());
+            }
+            });
+            if (selectedTaskIDs.length > 0) {
+
+            var assignToid = $('#assignDDL').val();
+            if (assignToid) {
+            var assignObj = {};
+            assignObj.assigneeId = $('#assignDDL').val();
+            assignObj.reservationNo = selectedTaskIDs;
+
+            $.ajax({
+                     url: '@Url.Action("OpenAssignAnyUser_Multiple", "Reservation")',
+                     method: 'Post',
+                     data: { assignObj },
+                     success: response => {
+                     if (response && response.success) {
+                     Swal.fire({
+                     icon: 'success',
+                     text: response.message,
+                     }).then(res => {
+                     $('#MultiAssignModal').modal('hide');
+                     loadList();
+                     });
+                     } else {
+                     Swal.fire({
+                     icon: 'error',
+                     text: (response && response.message) ? response.message : 'Failed to Assign',
+                     });
+
+            }
+            }
+            });
+
+            } else
+            {
+            $('#assingUserError').text('Select user');
+            }
+
+            }
+            else {
+            Swal.fire({
+            type: "error",
+            text: "No Reservations selected",
+            });
+            }
+
+
+
+            }
+
+            $(".RowChk").prop('checked', status);
+
+</script>
+
+<script>
+    $(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const actionId = urlParams.get('action');
+        initDateRange();
+        reset();
+        if (actionId) {
+            $('#ActionStepId').val(actionId);
+        }
+        loadList();
+        loadUsers();
+        getAllBranches();
+        $('#calBookingDtRange').attr('readOnly', 'true');
+        $('#calPickUpDtRange').attr('readOnly', 'true');
+        $('#calCancelDtRange').attr('readOnly', 'true');
+
+        if (actionId) {
+            $('#ActionStepId').val(actionId);
+        }
+        $('#formSearchOpen').on('submit', loadList);
+    });
+
+</script>

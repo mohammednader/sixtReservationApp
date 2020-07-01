@@ -1,0 +1,98 @@
+// Ecommerce Pro Cards
+// Collection card
+.collection-card {
+    .stripe {
+        position: absolute;
+        bottom: $collection-card-stripe-bottom;
+        width: 100%;
+        @include padding( $collection-card-stripe-padding);
+        @include text-align( center);
+
+        &.dark {
+            background-color: $collection-card-stripe-dark-bgc;
+
+            a {
+                p {
+                    color: $collection-card-stripe-dark-a-p-color;
+                }
+            }
+        }
+
+        &.light {
+            background-color: $collection-card-stripe-light-bgc;
+
+            a {
+                p {
+                    color: $collection-card-stripe-light-a-p-color;
+                }
+            }
+        }
+
+        a {
+            p {
+                @include padding( 0);
+                @include margin( 0);
+                letter-spacing: $collection-card-stripe-letter-spacing;
+            }
+        }
+    }
+}
+
+.rating {
+  @include padding( 0);
+  color: $ecommerce-rating-color;
+  list-style-type: none;
+  li {
+    display: inline-block;
+  }
+}
+
+// Cart modal
+.cart-modal {
+    .table,
+    th {
+        @include text-align( center);
+    }
+
+    .table {
+        .total {
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .fa-times {
+            color: $primary-color;
+        }
+    }
+}
+
+.card {
+  &.card-ecommerce {
+    .card-footer {
+      background-color: transparent;
+      .discount {
+        color: $ecommerce-card-footer-discount-color;
+      }
+      a {
+        color: $ecommerce-card-footer-a-color;
+        transition: $ecommerce-card-footer-a-hover-transition;
+        &:hover {
+          color: $ecommerce-card-footer-a-hover-color;
+          transition: $ecommerce-card-footer-a-hover-transition;
+        }
+        &.active {
+          color: $ecommerce-card-footer-a-active-color;
+        }
+      }
+    }
+  }
+}
+
+// Product table
+.product-table {
+  .btn {
+    &.btn-sm {
+      @include padding( $ecommerce-product-table-btn-sm-py $ecommerce-product-table-btn-sm-px);
+    }
+  }
+}

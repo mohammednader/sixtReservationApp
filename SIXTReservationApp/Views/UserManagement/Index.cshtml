@@ -1,0 +1,291 @@
+﻿@model SIXTReservationBL.Models.ViewModels.UserSC
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="d-flex mb-2   justify-content-end">
+    <a class="btn btn-primary btn-md mr-0" href="@Url.Action("CreateUser")">
+        <b>Add User</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+    </a>
+</div>
+<div class="ibox">
+    <div class="ibox-head">
+        <div class="ibox-title">Search</div>
+        <div class="ibox-tools">
+            <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+            <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+        </div>
+    </div>
+    <div class="ibox-body">
+        <form id="formSearchUsers" class="form-horizontal">
+            <div class="form-group row">
+                <div class="col-4">
+                    <label class="font-bold" asp-for="Name"></label>
+                </div>
+
+                <div class="col-4">
+                    <label class="font-bold" asp-for="Email"></label>
+                </div>
+
+                <div class="col-4">
+                    <label class="font-bold" asp-for="PhoneNumber"></label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <input class="form-control" asp-for="Name" type="text" placeholder="Name">
+                </div>
+                <div class="col-4">
+                    <input asp-for="Email" class="form-control" placeholder="Email" />
+                </div>
+                <div class="col-4">
+                    <input asp-for="PhoneNumber" onkeypress="return isNumberKey(event)" class="form-control" placeholder="Phone Number" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <label class="font-bold" asp-for="JobTitle"></label>
+                </div>
+
+                <div class="col-4">
+                    <label class="font-bold" asp-for="Branch"></label>
+                </div>
+
+                <div class="col-4">
+                    <label class="font-bold" asp-for="Role"></label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <select asp-for="JobTitle" class="mdb-select" Searchable="Search here...">
+                        <option class="default" value="" selected disabled>Select job titles</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <select asp-for="Branch" class="mdb-select" multiple Searchable="Search here...">
+                        <option class="default" value="" selected disabled>Select Branch</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <select asp-for="Role" class="mdb-select" multiple Searchable="Search here...">
+                        <option class="default" value="" selected disabled>Select Role</option>
+                    </select>
+                </div>
+                <div class="col-4 mt-3">
+                    <label class="font-bold" asp-for="Status"></label>
+                    <select asp-for="Status" class="mdb-select">
+                        <option class="default" value="0" selected>All</option>
+                        <option value="1">Active</option>
+                        <option value="2">Inactive</option>
+                    </select>
+                </div>  
+                <div class="col-4 mt-3">
+                   
+
+                </div>   
+                <div class="col-4 mt-5">
+                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                    <button type="reset" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" onclick="clearBTN()">
+                        Cancel
+                    </button>
+
+                </div>
+            </div>
+
+          
+        </form>
+    </div>
+</div>
+<div id="divUsers">
+
+</div>
+
+<div id="modal-container"></div>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+<script>
+
+    function loadUsers(e) {
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#formSearchUsers').serialize();
+        $.ajax({
+            url: '@Url.Action("_UserList")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#divUsers').html(response);
+                    $('#UserTable').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load users',
+                    });
+                }
+            }
+        });
+    }
+
+    async function deactivateUser(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to deactivate this user?',
+            confirmButtonText: 'Ok',
+             showCancelButton: true,
+
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeactivateUser")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadUsers();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to deactivate user',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    async function activateUser(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to activate this user',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("ActivateUser")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadUsers();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to activate user',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    async function resetPassword(id) {
+        $.ajax({
+            url: '@Url.Action("ResetPassword")/' + id,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#modal-container').html(response);
+                    $('#modalResetPassword').modal('show');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        type: 'An error occured, please try again',
+                    });
+                }
+            }
+        })
+    }
+
+
+</script>
+
+<script>
+    async function getAllRoles() {
+        $('#Role').empty();
+        $('#Role').append('<option class="default" value="" selected disabled>Select roles</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllRoles", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        $('#Role').append(`<option value="${r.id}">${r.name}</option>`);
+                    });
+                }
+            }
+        });
+    }
+
+    async function getAllJobTitles() {
+        $('#JobTitle').empty();
+        $('#JobTitle').append('<option class="default" value="" selected disabled>Select job titles</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllJobTitles", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(j => {
+                        $('#JobTitle').append(`<option value="${j.id}">${j.name}</option>`);
+                    });
+                }
+            }
+        });
+    }
+
+    async function getAllBranches() {
+        $('#Branch').empty();
+        $('#Branch').append('<option class="default" value="" selected disabled>Select Branch</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllBranches", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(j => {
+                        $('#Branch').append(`<option value="${j.id}">${j.name}</option>`);
+                    });
+                }
+            }
+        });
+    }
+</script>
+<script>
+
+    function clearBTN() {
+        console.log("reset");
+        $("#formSearchUsers").resetForm();
+        $(".default").prop('selected', true);
+        $(".default").attr('selected', true);
+
+        loadUsers();
+    }
+</script>
+<script>
+    $(() => {
+
+        loadUsers();
+        getAllRoles();
+        getAllJobTitles();
+        getAllBranches();
+        $('#formSearchUsers').on('submit', loadUsers);
+    })
+</script>
+

@@ -1,0 +1,152 @@
+﻿
+@{
+    ViewData["Title"] = "Uploads List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="ibox mt-2">
+    <div class="ibox-head">
+        <div class="ibox-title">Search</div>
+        <div class="ibox-tools">
+            <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+            <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+        </div>
+    </div>
+    <div class="ibox-body">
+        <form id="formSearchUploads" class="form-horizontal">
+            <div class="form-group row">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label class="font-bold">Upload  Date Range</label>
+                        <input type="hidden" id="hfUploadDtFrom" name="UploadDateFrom" />
+                        <input type="hidden" id="hfUploadDtTo" name="UploadDateTo" />
+                        <input id="calUploadDtRange" class="form-control" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label class="font-bold">Upload Status</label>
+                        <select id="UploadStatusId" name="UploadStatusId" class="mdb-select" Searchable="Search here..." multiple>
+                            <option class="default" disabled selected>Select One</option>
+                            <option value="1">Uploaded</option>
+                            <option value="2">Parsed</option>
+                            <option value="3">Failed</option>
+                            <option value="4">Cancelled</option>
+                        </select>
+                    </div>
+                </div> 
+                <div class="col-4 mt-4">
+                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                    <button type="reset" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" onclick="clearSearch()">
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+         
+        </form>
+    </div>
+</div>
+<div id="divUploads">
+
+</div>
+
+<script>
+
+    function loadList(e) {
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#formSearchUploads').serialize();
+        $.ajax({
+            url: '@Url.Action("_UploadsList")?' + form ,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#divUploads').html(response);
+                    $('#UploadsTable').DataTable({
+                        "columnDefs": [
+                            {
+                                "targets": [2],
+                                "visible": true,
+                                "orderData": [0]
+                            },
+                            {
+                                "targets": [0],
+                                "visible": false,
+                            }
+                        ],
+                        "autoWidth": false
+                    });
+              
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load uploads',
+                    });
+                }
+            }
+        });
+    }
+
+    async function initDateRange() {
+        $('#calUploadDtRange').daterangepicker({
+            opens: 'right',
+            timePicker: true,
+            timePickerIncrement: 15,
+            timePicker24Hour: true,
+            maxSpan: {
+                'years': 1,
+            },
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD MMM YYYY',
+            },
+            //ranges: {
+            //    'Today': [moment().startOf('day'), moment().endOf('day')],
+            //    'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+            //    'Tomorrow': [moment().add(1, 'days').startOf('day'), moment().add(1, 'days').endOf('day')],
+            //    'This Week': [moment().startOf('week'), moment().endOf('week')],
+            //    'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //},
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD MMM YYYY') + ' - ' + picker.endDate.format('DD MMM YYYY'));
+            $('#hfUploadDtFrom').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#hfUploadDtTo').val(picker.endDate.format('YYYY-MM-DD'));
+        }).on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $('#hfUploadDtFrom').val('');
+            $('#hfUploadDtTo').val('');
+        });
+
+
+
+    }
+
+    function reset() {
+        $('#calUploadDtRange').val('');
+        $('#hfUploadDtFrom').val('');
+        $('#hfUploadDtTo').val('');
+        $('#UploadStatusId').val('');
+    }
+
+    function clearSearch() {
+        reset();
+        loadList();
+    }
+
+</script>
+
+<script>
+    $(() => {
+        loadList();
+        initDateRange();
+        reset();
+        $('#formSearchUploads').on('submit', loadList);
+    });
+</script>

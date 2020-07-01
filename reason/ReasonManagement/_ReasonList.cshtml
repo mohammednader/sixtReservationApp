@@ -1,0 +1,95 @@
+﻿@model SIXTReservationApp.Models.Reason.ReasonVM[]
+@{
+    ViewData["Title"] = "Reason List";
+
+}
+
+
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-head">
+            <div class="ibox-title">Reason List</div>
+        </div>
+        <div class="ibox-body">
+            <table class="table table-striped table-bordered table-hover" id="example-table" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Reason Name</th>
+                        <th>Reservation Status</th>
+                        <th>Category Status</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Length > 0)
+                    {
+                        @for (int i = 0; i < Model.Length; i++)
+                        {
+                            var item = Model[i];
+                    <tr>
+                        <td>
+                            @item.Reason
+                        </td>
+                        <td>
+                            @item.ReservationStatus
+                        </td>
+                        <td>
+                            @if (item.Status ?? false)
+                            {
+                                <span>  <i title="Answer" class="fa fa-check text-success"></i>Answer</span>
+                            }
+                            else
+                            {
+                                <span> <i title="No Answer" class="fa fa-times text-danger"></i> No Answer</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsActive ?? false)
+                            {
+                                 <i title="Active" class="fa fa-check text-success"></i>
+                            }
+                            else
+                            {
+                                 <i title="Deactive" class="fa fa-times text-danger"></i>
+                            }
+                        </td>
+                        <td>
+                            <button onclick="Edit(@item.Id)" class="btn btn-default btn-xs m-r-5" data-toggle="tooltip"
+                                    data-original-title="Edit">
+                                <i class="fa fa-pencil font-14"></i>
+                            </button>
+                            @if (item.IsActive ?? false)
+                            {
+                                <button class="btn btn-default btn-xs" data-toggle="tooltip"
+                                        data-original-title="Deactivate" onclick="deactivateReason(@item.Id)">
+                                    <i class="fa fa-times font-14"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-default btn-xs" data-toggle="tooltip"
+                                        data-original-title="Activate" onclick="activateReason(@item.Id)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            }
+                            <button onclick="Delete(@item.Id)" class="btn btn-danger btn-xs m-r-5" data-toggle="tooltip"
+                                    data-original-title="Delete">
+                                <i class="fa fa-times font-14"></i>
+                            </button>
+                        </td>
+                    </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(() => {
+        $('.material-tooltip-main').tooltip();
+    })
+</script>

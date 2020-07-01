@@ -1,0 +1,517 @@
+﻿@model List<SIXTReservationApp.Models.ReservationHistoryVM>
+
+@{
+    ViewData["Title"] = "History";
+}
+<style>
+    #email-parallel-error, #password-parallel-error {
+        font-size: 12.8px;
+        font-size: .8rem;
+        font-weight: 500;
+        color: red !important;
+        top: -20px !important;
+    }
+
+    ul.stepper .step-title:after {
+        display: none;
+    }
+</style>
+<div class="ibox  mt-2">
+    <div class="ibox-head"><div class="ibox-title"> Reservation number @ViewBag.ReservationId History</div></div>
+
+    <div class="ibox-body">
+        <ul class="stepper linear <!--parallel-->">
+            @if (Model.Count > 0)
+            {
+
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    <li id="li_step_@i" class="step">
+
+                        <div data-step-label="Type something" class="step-title waves-effect waves-dark">@item.StepName</div>
+
+                        <div id="step_@i" class="step-new-content" style="display: block;">
+                            @if (item.FormSubmitUserId == null && item.FormCustomerEmail == string.Empty && item.AssignFrom !=string.Empty)
+                            {
+                                <div class="row">
+                                    <!-- step conetnt -->
+                                    <div class="md-form col-6 m-5">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <td class="font-weight-bold">From User</td>
+                                                    <td class="font-weight-bold">To User</td>
+                                                    <td class="font-weight-bold">Date</td>
+                                                </tr>
+                                            </thead>
+                                            <tr>
+                                                <td>@item.AssignFrom</td>
+                                                <td>@item.AssignTo</td>
+                                                <td>@item.AssignCreationDate</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            }
+                            else if (item.FormSubmitUserId != null && item.FormCustomerEmail == string.Empty)
+                            {
+                                <div class="row">
+                                    <!-- step conetnt -->
+                                    <div class="md-form col-6 m-5">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <td class="font-weight-bold">Created User</td>
+                                                    <td class="font-weight-bold">creation Date</td>
+                                                    <td class="font-weight-bold">Reason</td>
+                                                    <td class="font-weight-bold">Comment</td>
+                                                </tr>
+                                            </thead>
+
+                                            <tr>
+                                                <td>@item.UserSubmit</td>
+                                                <td>@item.FormSubmitCreationDate</td>
+                                                <td>@item.FormSubmitReason</td>
+                                                <td>@item.Comment</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                            else if (item.FormCustomerEmail != string.Empty)
+                            {
+                                <div class="row">
+                                    <!-- step conetnt -->
+                                    <div class="md-form col-6 m-5">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <td class="font-weight-bold">Modified By</td>
+                                                    <td class="font-weight-bold">Customer Email</td>
+                                                    <td class="font-weight-bold">Customer Phone</td>
+                                                    <td class="font-weight-bold">Comment</td>
+                                                    <td class="font-weight-bold">Creation Date</td>
+
+                                                </tr>
+                                            </thead>
+                                            <tr>
+                                                <td>@item.FormCustomerModifiedByName</td>
+                                                <td>@item.FormCustomerEmail</td>
+                                                <td>@item.FormCustomerPhone</td>
+                                                <td>@item.FormCustomerComment</td>
+                                                <td>@item.FormCustomerCreationDate</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row">
+                                </div>
+                            }
+                        </div>
+                    </li>
+                }
+            }
+
+
+          
+
+            @if (ViewBag.status == 1)
+            {
+
+            <a href="@Url.Action("CByCustomerIndex", "Reservation")" class="btn btn-link  float-right">Back to list</a>
+            }
+            else if (ViewBag.status == 3)
+            {
+            <a href="@Url.Action("NoShowIndex", "Reservation")" class="btn btn-link  float-right">Back to list</a>
+
+            }
+            else
+            {
+            <a href="@Url.Action("CBySixtIndex", "Reservation")" class="btn btn-link  float-right">Back to list</a>
+            }
+        </ul>
+    </div>
+</div>
+
+<script>
+
+    @*var ReservationId =@ViewBag.ReservationId;
+    var CurrentStep =@ViewBag.CurrentStep;
+
+
+    $(document).ready(function () {
+        $('.stepper').mdbStepper();
+        GetSteps();
+
+
+
+    })*@
+</script>
+<script>
+    function GetSteps()
+    {
+        if (CurrentStep == 1)
+        {
+            $('#li_step_1').addClass("active");
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+            GetFirstStep();
+
+        }
+        if (CurrentStep == 2)
+        {
+
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            getSecondStep();
+
+            GetFirstStep();
+
+
+
+        }
+        if (CurrentStep == 3)
+        {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+
+
+
+
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+
+        }
+        if (CurrentStep == 4) {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+            $('#li_step_4').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+            $('#li_step_4').addClass("done");
+            $('#step_4').css("display", "inline");
+
+
+            getStepFour();
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+
+        }
+        if (CurrentStep == 5) {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+            $('#li_step_4').css('display', 'inline');
+            $('#li_step_5').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+            $('#li_step_4').addClass("done");
+            $('#step_4').css("display", "inline");
+
+            $('#li_step_5').addClass("done");
+            $('#step_5').css("display", "inline");
+
+
+            getStepFive();
+            getStepFour();
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+
+        }
+        if (CurrentStep == 6) {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+            $('#li_step_4').css('display', 'inline');
+            $('#li_step_5').css('display', 'inline');
+            $('#li_step_7').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+            $('#li_step_4').addClass("done");
+            $('#step_4').css("display", "inline");
+
+            $('#li_step_5').addClass("done");
+            $('#step_5').css("display", "inline");
+
+            $('#li_step_7').addClass("done");
+            $('#step_7').css("display", "inline");
+            getStepSeven();
+            getStepFive();
+            getStepFour();
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+        }
+        if (CurrentStep == 7) {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+            $('#li_step_4').css('display', 'inline');
+            $('#li_step_5').css('display', 'inline');
+            $('#li_step_6').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+            $('#li_step_4').addClass("done");
+            $('#step_4').css("display", "inline");
+
+            $('#li_step_5').addClass("done");
+            $('#step_5').css("display", "inline");
+
+            $('#li_step_7').addClass("done");
+            $('#step_7').css("display", "inline");
+            $('#li_step_8').addClass("done");
+            $('#step_8').css("display", "inline");
+            getStepEight();
+            getStepSeven();
+            getStepFive();
+            getStepFour();
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+        }
+        if (CurrentStep == 8) {
+            $('#li_step_2').css('display', 'inline');
+            $('#li_step_3').css('display', 'inline');
+            $('#li_step_4').css('display', 'inline');
+            $('#li_step_5').css('display', 'inline');
+            $('#li_step_7').css('display', 'inline');
+            $('#li_step_8').css('display', 'inline');
+            $('#li_step_9').css('display', 'inline');
+
+
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "inline");
+
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "inline");
+
+            $('#li_step_3').addClass("done");
+            $('#step_3').css("display", "inline");
+
+            $('#li_step_4').addClass("done");
+            $('#step_4').css("display", "inline");
+
+            $('#li_step_5').addClass("done");
+            $('#step_5').css("display", "inline");
+
+            $('#li_step_7').addClass("done");
+            $('#step_7').css("display", "inline");
+            $('#li_step_8').addClass("done");
+            $('#step_8').css("display", "inline");
+            $('#li_step_9').addClass("done");
+            $('#step_9').css("display", "inline");
+            getStepNine();
+            getStepEight();
+            getStepSeven();
+            getStepFive();
+            getStepFour();
+            getSecondStep();
+            getthirdStep();
+            GetFirstStep();
+        }
+
+
+
+
+
+
+
+    }
+    async function GetFirstStep()
+    {
+         $.ajax({
+            url: "/Reservation/_OpenNotify/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res)
+                {
+                    $('#step_1').append(res);
+                }
+
+                else
+                {
+
+                }
+            },
+            error: (x, y) => { console.log(x) }
+
+        })
+    }
+
+    function getSecondStep()
+    {
+        console.log("2nd step")
+        $.ajax({
+            url: "/Reservation/_OpenAssignment/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_2').append(res);
+                }
+            },
+            error: () => { }
+        })
+    }
+
+    function getthirdStep()
+    {
+         console.log("3rd step")
+        $.ajax({
+            url: "/Reservation/_OpenFormSubmit/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_3').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+    }
+
+    function getStepFour()
+    {
+         console.log("4th step")
+        $.ajax({
+            url: "/Reservation/_OpenCAgentManagementAssignment/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_4').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+    }
+
+   function getStepFive()
+    {
+         console.log("5th step")
+        $.ajax({
+            url: "/Reservation/_OpenContactCenterFormSubmit/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_5').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+    }
+
+
+    function getStepSeven()
+    {
+       console.log("7th step")
+        $.ajax({
+            url: "/Reservation/_OpenConfirmedSendEmailDone/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_7').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+
+    }
+     function getStepEight()
+    {
+       console.log("8th step")
+        $.ajax({
+            url: "/Reservation/_OpenBranchAssignment/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_8').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+
+    }
+     function getStepNine()
+    {
+       console.log("9th step")
+        $.ajax({
+            url: "/Reservation/_OpenBranchAgentFormSubmit/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_9').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+
+    }
+
+   
+
+
+
+</script>

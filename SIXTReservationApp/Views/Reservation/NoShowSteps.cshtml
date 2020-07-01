@@ -1,0 +1,212 @@
+﻿
+@{
+    ViewData["Title"] = "steps";
+}
+<style>
+    #email-parallel-error, #password-parallel-error {
+        font-size: 12.8px;
+        font-size: .8rem;
+        font-weight: 500;
+        color: red !important;
+        top: -20px !important;
+    }
+
+    ul.stepper .step-title:after {
+        display: none;
+    }
+</style>
+<div class="ibox  mt-2">
+    <div class="ibox-head"><div class="ibox-title"> Reservation number @ViewBag.ReservationId steps</div></div>
+
+    <div class="ibox-body">
+        <ul class="stepper linear <!--parallel-->">
+
+
+
+
+            <li id="li_step_1" class="step">
+
+                <div data-step-label="Type something" class="step-title waves-effect waves-dark">Send notification</div>
+
+                <div id="step_1" class="step-new-content" style="display: block;">
+                    <!--your content here-->
+                </div>
+            </li>
+
+
+
+
+
+            <li id="li_step_2" class="step">
+                <div class="step-title waves-effect waves-dark">Assign user </div>
+                <div id="step_2" class="step-new-content" style="display: block;">
+                    <!--your content here-->
+                </div>
+            </li>
+
+            <li id="li_step_3" class="step">
+                <div class="step-title waves-effect waves-dark">Form Submit</div>
+                <div id="step_3" class="step-new-content" style="display: block;">
+                    <!--your content here-->
+                </div>
+                @*<div class="step-new-content">
+                        Finish!
+                        <div class="step-actions">
+                            <button class="waves-effect waves-dark btn-sm  btn btn-primary m-0 mt-4" type="button">SUBMIT</button>
+                        </div>
+                    </div>*@
+            </li>
+            <a href="@Url.Action("NoShowIndex", "Reservation")" class="btn btn-link  float-right">Back to list</a>
+        </ul>
+    </div>
+</div>
+
+<script>
+    var CurrentStep=@ViewBag.CurrentStep;
+    var ReservationId=@ViewBag.ReservationId;
+
+    $(document).ready(function () {
+        $('.stepper').mdbStepper();
+        GetSteps();
+        GetFirstStep();
+
+
+    })
+</script>
+<script>
+    function GetSteps()
+    {
+        if (CurrentStep == 2) {
+            $('#li_step_2').removeClass("active");
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "none");
+            $('#li_step_2').addClass("done");
+            $('#step_2').css("display", "none");
+            $('#li_step_3').addClass("active");
+            getSecondStep();
+            getthirdStep();
+        }
+        if (CurrentStep == 1) {
+            $('#li_step_1').removeClass("active");
+            $('#li_step_1').addClass("done");
+            $('#step_1').css("display", "none");
+            $('#li_step_2').addClass("active");
+            $('#step_3').removeClass("step");
+            getSecondStep();
+        }
+        if (CurrentStep == 0) {
+            $('#li_step_1').addClass("active");
+            $('#step_2').removeClass("step");
+            $('#step_3').removeClass("step");
+
+        }
+    }
+    async function GetFirstStep()
+    {
+         $.ajax({
+            url: "/Reservation/_NoShowNotify/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res)
+                {
+                    $('#step_1').append(res);
+                }
+
+                else
+                {
+
+                }
+            },
+            error: (x, y) => { console.log(x) }
+
+        })
+    }
+
+    function getSecondStep()
+    {
+        console.log("2nd step")
+        $.ajax({
+            url: "/Reservation/_NoShowAssignment/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_2').append(res);
+                }
+            },
+            error: () => { }
+        })
+    }
+
+    function getthirdStep()
+    {
+         console.log("3rd step")
+        $.ajax({
+            url: "/Reservation/_NoShowFormSubmit/"+@ViewBag.ReservationId,
+            type: "Get",
+            success: (res) => {
+                if (res) {
+                    $('#step_3').append(res);
+                }
+            },
+            error: () => { }
+        })
+
+    }
+
+    function assignAgent()
+    {
+        var assignObj = {};
+        assignObj.assigneeId = $('#assignDDL').val();
+        assignObj.reservationId = @ViewBag.ReservationId;
+        assignObj.currentStep = @ViewBag.CurrentStep
+        assignObj.reservationNo= @ViewBag.ReservationId;
+
+        $.ajax({
+            url: '@Url.Action("NoShowAssignAgent_Multiple", "Reservation")',
+            method: 'Post',
+            data: { assignObj},
+            success: response => {
+                if (response && response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        text: response.message,
+                    }).then(res => { location.reload() });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: (response && response.message) ? response.message : 'Failed to Assign',
+                    });
+
+                }
+            }
+        });
+
+    }
+
+    function formSubmit()
+    {
+        var form = $('#formSubmit').serialize();
+        form += '&ReservationId=@ViewBag.ReservationId';
+        console.log(form);
+        $.ajax({
+            url: '@Url.Action("NoShowFormSubmitted", "Reservation")',
+            method: 'Post',
+            data: form ,
+            success: response => {
+                if (response && response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        text: response.message,
+                    }).then(res => { location.reload() });;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: (response && response.message) ? response.message : 'Failed to submit form',
+                    });
+
+                }
+            }
+        });
+
+    }
+</script>

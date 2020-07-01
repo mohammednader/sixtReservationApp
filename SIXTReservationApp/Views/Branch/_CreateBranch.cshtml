@@ -1,0 +1,68 @@
+﻿@model SIXTReservationApp.ViewModels.BranchVM
+@{Layout = "_PartialLayout";}
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+
+
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateBranch" autocomplete="off" enctype="multipart/form-data" asp-controller="Branch" asp-action="CreateBranch">
+                <div class="row">
+                    <input id="branchId" asp-for="Id" hidden />
+                    <div class="col-sm-12 form-group">
+                        <label><b>Branch Name</b></label><span id="Redasterisks"> *</span>
+                        <input asp-for="Name" class="form-control" type="text" placeholder="Branch Name" required>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label><b>Code</b></label><span id="Redasterisks"> *</span>
+                        <input asp-for="Code" class="form-control" type="text" placeholder="Code" required>
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 form-group">
+                        <label><b>Email</b></label><span id="Redasterisks"> *</span>
+                        <input asp-for="Email" class="form-control" type="text" placeholder="Email address" required>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 form-group">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@*button click*@
+<script>
+
+    $('#CreateBranch').ajaxForm(response => {
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadBranches()
+
+
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+</script>

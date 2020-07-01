@@ -1,0 +1,64 @@
+﻿@model SIXTReservationApp.Models.UploadLogVM[]
+
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-head">
+            <div class="ibox-title">Uploads List</div>
+        </div>
+        <div class="ibox-body">
+            <table class="table table-striped table-bordered table-hover" id="UploadsTable" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th data-sortable="false" class="text-left">Uploaded By</th>
+                        <th class="text-center">Upload Date</th>
+                        <th data-sortable="false" class="text-center">Status</th>
+                        <th class="text-center">Number Of Entries</th>
+                        <th class="text-center">Saved Records</th>
+                        <th class="text-center">Failed Records</th>
+                        <th class="text-center">File Name</th>
+                        <th data-sortable="false" class="text-center">Export Failed Number report </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Length > 0)
+                    {
+                        @for (int i = 0; i < Model.Length; i++)
+                        {
+                            var item = Model[i];
+                    <tr>
+                        <td>@item.Id</td>
+                        <td class="text-left"><a href="#">@item.Id - @item.UploadedBy</a></td>
+                        <td class="text-center">@item.UploadedTime</td>
+                        <td class="text-center">@item.UploadStatus</td>
+                        <td class="text-center">@item.NumberOfEntries</td>
+                        <td class="text-center">@item.SavedRecordNum</td>
+                        <td class="text-center">@item.FailedRecordNum</td>
+                        <td class="text-center">@item.FileName</td>
+                        <td class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(item.ErrorLogPath))
+                            {
+
+
+                                <button class="material-tooltip-main btn-primary btn btn-floating btn-sm my-0 p-0 m-0" data-toggle="tooltip" title="Export">
+                                    <a href="@item.ErrorLogPath" download="FailedReservationNo_@item.UploadedTime"><i class="fa  fa-download"> </i> </a>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+
+
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">No resevations found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

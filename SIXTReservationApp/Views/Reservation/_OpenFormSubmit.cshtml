@@ -1,0 +1,97 @@
+﻿@model SIXTReservationApp.Models.CByCustomerReservation.FormSubmitVM
+
+
+<div class="check-list">
+    <label class="ui-radio ui-radio-primary">
+        <input class="selectOption" type="radio" value="true" asp-for="@Model.IsOpenConfirm">
+        <span class="input-span"></span>Confirm
+    </label>
+    <label class="ui-radio ui-radio-primary">
+        <input class="selectOption" type="radio" value="false" asp-for="@Model.IsOpenConfirm">
+        <span class="input-span"></span>Deny
+    </label>
+</div>
+
+<div id="DenyDiv" style="display:none">
+    <form id="formSubmit">
+
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Reason</b></label>
+                <select id="reasonDDL" asp-for="@Model.ReasonId" class="form-control validate" required>
+                    <option selected disabled>Select Reason</option>
+                </select>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+            </div>
+        </div>
+
+        <div class="ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="formSubmit()">Submit</button>
+        </div>
+    </form>
+</div>
+<div id="ConfirmDiv" style="display:none">
+    <div class="alert alert-light d-flex flex-column align-items-center" role="alert">
+        <h2 class="alert-heading">Confirmation</h2>
+        <p>Are you sure to confirm this reservation</p>
+        <form id="formSubmit">
+            <div class="ml-1">
+                <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-12" onclick="formConfirm()">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(() => {
+        LoadReason();
+
+
+        $('input[type=radio][name=IsOpenConfirm]').change(function () {
+            if (this.value == 'true')
+            {
+                $("#DenyDiv").css('display', 'none');
+                $("#ConfirmDiv").css('display', 'inline');
+            }
+            else if (this.value == 'false')
+            {
+                $("#ConfirmDiv").css('display', 'none');
+                $("#DenyDiv").css('display', 'inline');
+
+            }
+        });
+    })
+
+  function LoadReason()
+    {
+      $('#reasonDDL').empty();
+      $('#reasonDDL').append('<option selected disabled > select Reason</option>');
+      var isAnswer = $('#statusDDL').val();
+      console.log(isAnswer);
+        $.ajax({
+            url: '@Url.Action("GetReasonForCBySixt", "Reservation")',
+            method: 'GET',
+            data: { isAnswer},
+            success: response => {
+                console.log(response);
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#reasonDDL').append(node);
+                    });
+                }
+
+
+            }
+        });
+    }
+
+   
+
+</script>
+

@@ -1,0 +1,114 @@
+﻿@model SIXTReservationApp.Models.Reason.ReasonVM
+@{Layout = "_PartialLayout";
+        
+    }
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateReason" method="post" asp-controller="ReasonManagement" asp-action="CreateReason">
+                <div class="row">
+                    <input id="ReasonId" asp-for="Id" hidden />
+                    <div class="col-12 form-group">
+                        <label><b>Reservation Status</b></label><span id="Redasterisks"> *</span>
+                                                                
+                        <select id="RStatusId" asp-for="ReservationStatusId" class="mdb-select"  onchange="hideMSG()" Searchable="Search here...">
+                            <option selected disabled>Select Reservation Status</option>
+                        </select>
+                        <span asp-validation-for="ReservationStatusId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="font-bold">Status</label>
+                        <select id="statusId" asp-for="Status" class="mdb-select">
+                            <option class="default"  value='' >None</option>
+                            <option value='true'>Answer</option>
+                            <option value='false'>No Answer</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label><b>Reason Name</b></label><span id="Redasterisks"> *</span>
+                        <input asp-for="Reason" class="form-control" type="text" placeholder="Reason Name" required>
+                        <span asp-validation-for="Reason" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 form-group">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit" >Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+     var GR_ReservationStatus = @Html.Raw(Json.Serialize(Model.ReservationStatusId));
+    var GR_Status = @Html.Raw(Json.Serialize(Model.Status));
+</script>
+@*button click*@
+<script>
+
+
+    $('#CreateReason').ajaxForm(response => {
+        if (!$('#RStatusId').val()) {
+            $("#MsgRequiredStatus").css("display", "inline-block");
+        }
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadReasons()
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+     async function loadReservationStatus() {
+         $('#RStatusId').empty();
+         $('#RStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    console.log(GR_Status);
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.status}</option>`);
+                        $("#RStatusId").val(GR_ReservationStatus);
+                        $('#statusId').val(GR_Status);
+                        $('#RStatusId').append(node);
+                    });
+                }
+                $('#RStatusId').materialSelect();
+            }
+        });
+    }
+
+    $(() => {
+        $('#statusId').materialSelect();
+        loadReservationStatus();
+    })
+
+    function hideMSG()
+    {
+        $("#MsgRequiredStatus").css("display", "none");
+    }
+</script>

@@ -1,0 +1,69 @@
+// MDB Autocomplete
+.mdb-autocomplete {
+  margin-bottom: $autocomplete-margin-bottom;
+
+  &::-webkit-search-decoration,
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-results-button,
+  &::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+}
+
+button {
+    &:focus {
+        outline: 0 !important;
+    }
+
+    &.mdb-autocomplete-clear {
+        position: absolute;
+        top: $autocomplete-clear-top;
+        @include right( 0);
+        z-index: 2;
+        @include cursor( pointer);
+        visibility: hidden;
+        @include background( transparent);
+        border: none;
+
+        svg {
+            fill: $autocomplete-clear-color;
+        }
+    }
+}
+
+.mdb-autocomplete-wrap {
+    position: absolute;
+    @include right( 0);
+    @include left( 0);
+    z-index: 100;
+    max-height: $autocomplete-wrap-max-height;
+    @include padding-left( 0);
+    overflow-y: auto;
+    list-style-type: none;
+    @include background( $white-base);
+    box-shadow: $z-depth-1;
+
+    li {
+        @include padding( $autocomplete-wrap-li-padding-y $autocomplete-wrap-li-padding-x);
+        font-size: $autocomplete-wrap-li-font-size;
+        @include cursor( pointer);
+
+        &:hover {
+            @include background( $autocomplete-wrap-li-hover-bg);
+        }
+
+        &.selected {
+            background-color: $autocomplete-wrap-li-hover-bg;
+        }
+    }
+}
+
+.form-inline {
+  .md-form {
+    .form-control {
+      &.mdb-autocomplete {
+        width: $form-inline-autocomplete-width;
+      }
+    }
+  }
+}

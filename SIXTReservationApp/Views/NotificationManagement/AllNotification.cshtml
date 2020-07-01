@@ -1,0 +1,63 @@
+﻿@model List<SIXTReservationApp.Models.Notification.NotificationDto>
+
+@{
+    ViewData["Title"] = "Notification List";
+
+}
+
+
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-head">
+            <div class="ibox-title">All Notification</div>
+        </div>
+        <div class="ibox-body">
+            <table class="table table-bordered table-hover" id="example-table" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th data-sortable="false" class="text-left">Notification Text</th>
+                        <th data-sortable="false" class="text-center">Reservation Number</th>
+                        <th data-sortable="false" class="text-center">Date</th>
+
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        @for (int i = 0; i < Model.Count(); i++)
+                        {
+                            var item = Model[i];
+                            string bgClass = "";
+                            @if (item.IsSeen != true)
+                            {
+                                bgClass = "background-color: #D3D3D3;";
+                            }
+                            <tr style="@bgClass">
+                                <td class="text-left">
+                                    <a href="@item.URL" data-toggle="tooltip" title="Show" target="_blank">
+                                        @item.NotificationText
+                                    </a>
+
+                                </td>
+                                <td>
+                                    @item.ReservationNum
+                                </td>
+                                <td>
+                                    @item.Date
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4">No notification</td></tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+

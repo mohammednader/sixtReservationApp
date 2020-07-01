@@ -1,0 +1,236 @@
+﻿@model SIXTReservationApp.Models.UserManagement.AddUserDto
+@{
+    ViewData["Title"] = ViewBag.Title;
+}
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<form asp-action="CreateUser" method="post" id="formUser" autocomplete="off">
+    <div class="card card-body mt-2">
+        <input type="hidden" asp-for="Id" />
+        <div class="row">
+            <div class="col-sm-4 form-group">
+                <label asp-for="Email" class="control-label"></label><span id="Redasterisks"> *</span>
+                <input type="email" asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            @if (Model.Id == 0)
+            {
+                <div class="col-sm-4 form-group">
+                    <label asp-for="Password" class="control-label"></label><span id="Redasterisks"> *</span>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <label asp-for="ConfirmPassword" class="control-label"></label><span id="Redasterisks"> *</span>
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger "></span>
+                </div>
+            }
+            <div class="col-sm-4 form-group">
+                <label asp-for="Name" class="control-label"></label><span id="Redasterisks"> *</span>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="col-sm-4 form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label><span id="Redasterisks"> *</span>
+                <input asp-for="PhoneNumber" onkeypress="return isNumberKey(event)" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="col-sm-4 form-group">
+                <label asp-for="JobTitle" class="control-label"></label><span id="Redasterisks"> *</span>
+                <select id="JobTitles" asp-for="JobTitle" class="mdb-select" Searchable="Search here...">
+                    <option value="" selected disabled>Select job title</option>
+                </select>
+                <span class="text-danger" id="errJobTitle"></span>
+            </div>
+            <div class="col-sm-4 form-group">
+                <label asp-for="Branch" class="control-label"></label>
+                <select asp-for="Branch" class="mdb-select" multiple onchange="validateSelectTags()" Searchable="Search here...">
+                    <option value="" selected disabled>Select Branch</option>
+                </select>
+                <span id="errBranch" class="text-danger"></span>
+            </div>
+            <div class="col-sm-4 form-group">
+                <label asp-for="Roles" class="control-label"></label>
+                <select asp-for="Roles" class="mdb-select" multiple Searchable="Search here...">
+                    <option value="" selected disabled>Select roles</option>
+                </select>
+                <span asp-validation-for="Roles" class="text-danger"></span>
+            </div>
+            <div class="col-sm-4 form-group form-check text-left d-flex flex-column justify-content-center">
+                <input type="checkbox" asp-for="IsActive" onchange="this.value=this.checked" class="form-check-input" />
+                <label class="form-check-label" asp-for="IsActive"></label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <span class="text-danger" id="errModel"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 ">
+                <button class="btn btn-primary float-right" type="submit">Save</button>
+                <a href="@Url.Action("Index", "UserManagement")" class="btn btn-link float-right">Back to list</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    var GRANTED_ROLES = @Html.Raw(Json.Serialize(Model.Roles));
+    var GRANTED_JOBTITLE = @Html.Raw(Json.Serialize(Model.JobTitle));
+    var GRANTED_Branch = @Html.Raw(Json.Serialize(Model.Branch));
+</script>
+
+<script>
+    async function getAllRoles() {
+        $('#Roles').empty();
+        $('#Roles').append('<option value="" selected disabled>Select roles</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllRoles", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        if (GRANTED_ROLES.indexOf(r.id) > -1) {
+                            node.prop('selected', true);
+                        }
+                        $('#Roles').append(node);
+                    });
+                }
+
+                $('#Roles').materialSelect();
+            }
+        });
+    }
+
+    async function getAllJobTitles() {
+        $('#JobTitles').empty();
+      //  $('#JobTitles').append('<option id="defaultOption" value="" selected><span style="color:#A9A9A9 !important;">Select job title</span></option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllJobTitles", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(j => {
+
+                        var node = $(`<option value=${j.id}>${j.name}</option>`);
+
+                        $('#JobTitles').append(node);
+                    });
+                }
+
+                $('#JobTitles').materialSelect();
+                 if (GRANTED_JOBTITLE)
+                 {
+                    $('#JobTitles').val(GRANTED_JOBTITLE);
+                }
+            }
+        });
+    }
+
+    async function getAllBranches() {
+        $('#Branch').empty();
+        $('#Branch').append('<option value="" selected disabled>Select Branch</option>');
+        $.ajax({
+            url: '@Url.Action("GetAllBranches", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(j => {
+                        var node = $(`<option value=${j.id}>${j.name}</option>`);
+                        if (GRANTED_Branch.indexOf(j.id) > -1) {
+                            node.prop('selected', true);
+                        }
+                        $('#Branch').append(node);
+                    });
+                }
+
+                $('#Branches').materialSelect();
+            }
+        });
+    }
+</script>
+
+<script>
+
+
+
+
+    function validateSelectTags() {
+        if (document.getElementById("JobTitles").value == 3 || document.getElementById("JobTitles").value == 4) {
+            if ($('#Branch').val() == '') {
+                $('#errBranch').text('This field is required');
+            }
+            else {
+                $('#errBranch').text('');
+            }
+        } else {
+            $('#errBranch').text('');
+        }
+
+        if (!$('#JobTitles').val()) {
+            $('#errJobTitle').text('');
+        } else {
+            $('#errJobTitle').text('');
+        }
+    }
+</script>
+
+<script>
+    $(() => {
+        @if (Model?.Id > 0)
+        {
+            <text>$('#formUser').attr('action', '@Url.Action("UpdateUser")')</text>
+        }
+
+        getAllBranches();
+        getAllRoles();
+        getAllJobTitles();
+
+        $('#formUser').ajaxForm(response => {
+            $('#errModel').text('');
+            $('#errBranch, #errJobTitle').text('');
+            if (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        text: response.message || "Succces",
+                    }).then(_ => {
+                        location.href = '@Url.Action("Index")';
+                    });
+                }
+                else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message || "Failed",
+                        });
+
+                }
+            } else {
+                if (!$('#JobTitles').val()) {
+                    $('#errJobTitle').text('This field is required');
+                }
+            }
+        });
+
+        $('#Branch, #JobTitles').on('change', e => {
+            validateSelectTags();
+        });
+
+        $('#formUser').on('submit', e => {
+            validateSelectTags();
+        });
+    });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

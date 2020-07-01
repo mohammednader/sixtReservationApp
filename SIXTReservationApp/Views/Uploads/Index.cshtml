@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewData["Title"] = "New Upload";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+ 
+
+    <div class="ibox mt-2">
+        <div class="ibox-head">
+            <div class="ibox-title">Upload new reservation sheet  </div>
+            <div class="ibox-tools">
+                <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+                <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+            </div>
+        </div>
+     
+
+        
+        <div class="ibox-body">
+            <form id="UploadReservationsForm" enctype="multipart/form-data" asp-action="UploadReservations" asp-controller="Uploads" class="form-horizontal">
+                <div class="form-group row">
+                    <label class="col-8 col-form-label"> </label>
+                </div>
+                <div class="form-group row">
+                    <div class="col-6 ">
+                         
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="customFile"  type="file" required name="fileExcel" placeholder="Name" accept=".xls,.xlsx">
+                            <label class="custom-file-label" for="customFile">Choose file</label>
+                        </div>
+                    </div>
+                    <div class="col-6 text-left">
+                        <button type="reset" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                            Cancel 
+                        </button>
+                        <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Upload</button>
+                    </div>
+
+                </div>
+            </form>
+
+             
+                
+             
+        </div>
+    </div>
+    <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
+<script>
+    var errorList;
+    $('#UploadReservationsForm').ajaxForm(response => {
+        if (response) {
+            if (response.ok == true) {
+                errorList = response.errorCodes;  
+
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message,
+                }).then(_ => {
+                    if (errorList && errorList.length) {
+                        download('FailedReservationNumbers.txt', errorList)
+                    }
+                    else {
+                        window.location.href = "/uploads/index"; 
+                    }
+                });
+            }
+            else {
+                errorList = response.errorCodes;
+                //if (errorList) {
+                //    for (var i = 0; i < errorList.length; i++) {
+                //        $('#old-data tbody').append('<tr><td>' + errorList[i].name + '</td><td>' + errorList[i].reason + '</td></tr>');
+                //    }
+                //}
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message,
+                }).then(_ => {
+                    if (errorList && errorList.length) {
+                        download('FailedReservationNumbers.txt', errorList)
+                    }
+                });
+            }
+        }
+    });
+
+    //onclick=""
+
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+
+</script>
+
+

@@ -1,0 +1,250 @@
+﻿@model SIXTReservationBL.Models.ViewModels.BranchSC
+@{
+    ViewData["Title"] = "Branch Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+         <div class="d-flex mb-2  justify-content-end">
+            <button class="btn btn-primary btn-md mr-0" onclick="Create()">
+
+                <b>Add Branch</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+            </button>
+        </div>
+        <div class="ibox">
+            <div class="ibox-head">
+                <div class="ibox-title">Search</div>
+                <div class="ibox-tools">
+                    <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+                    <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+                </div>
+            </div>
+            <div class="ibox-body">
+                <form id="searchBranch" class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="col-4 col-form-label">Branch Name</label>
+                        <label class="col-4 col-form-label">Code</label>
+                        <label class="col-4 col-form-label">Email</label>
+
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-4">
+                            <input class="form-control" asp-for="Name" type="text" placeholder="Name">
+                        </div>
+                        <div class="col-4">
+                            <input class="form-control" asp-for="Code" type="text" placeholder="Code">
+                        </div>
+                        <div class="col-4">
+                            <input class="form-control" asp-for="Email" type="text" placeholder="Email address">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                            <button type="button" onclick="clearForm()" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                                Cancel 
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+     <div id="DivBranch">
+
+    </div>
+ 
+<!--Create Modal -->
+<div class="modal fade" id="CreateBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateProductModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="resultCreate">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Edite Modal -->
+
+<div class="modal fade" id="editBranchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBranchModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="result">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script>
+
+    function loadBranches(e) {
+        $('#CreateBranchModal').modal('hide'); $('#editBranchModal').modal('hide');
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#searchBranch').serialize();
+        $.ajax({
+            url: '@Url.Action("_BranchList")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivBranch').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+
+     async function deactivateBranch(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to deactivate this Branch?',
+            confirmButtonText: 'Ok',
+             showCancelButton: true,
+
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeactivateBranch")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadBranches();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to deactivate branch',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    async function activateBranch(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to activate this branch?',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("ActivateBranch")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadBranches();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to activate branch',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    function clearForm(e) {
+        $('#searchBranch')[0].reset();
+        loadBranches();
+    }
+
+</script>
+
+@* create*@
+<script>
+
+    function Create() {
+
+        $.ajax({
+            url: '@Url.Action("CreateBranch", "Branch")',
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                $('#resultCreate').html(data);
+                $('#CreateProductModalTitle').text("Create Branch");
+                $('#CreateProductModalTitle').css("text-align", "center")
+                $('#CreateBranchModal').modal('show');
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+
+    }
+
+</script>
+@*edit*@
+<script>
+
+    function Edit(id) {
+        $.ajax({
+            url: '@Url.Action("UpdateBranch", "Branch")',
+            data: { id },
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $('#result').html('');
+                $('#resultCreate').html('');
+                 $('#result').html(data);
+                 $('#editBranchModalTitle').text("Update Branch");
+                 $('#CreateBranch').attr('action', '@Url.Action("UpdateBranch")');
+                 $('#btnSubmit').html('Update');
+                 $('#btnSubmit').removeClass("btn-primary");
+                 $('#btnSubmit').addClass("btn-success");
+                 $('#editBranchModal').modal('show');
+
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+    }
+
+</script>
+<script>
+    $(() => {
+        loadBranches();
+        $('#searchBranch').on('submit', loadBranches);
+    })
+</script>

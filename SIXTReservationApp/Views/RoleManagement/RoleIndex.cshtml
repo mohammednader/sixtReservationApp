@@ -1,0 +1,77 @@
+﻿
+@{
+    ViewData["Title"] = "Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="text-right m-0 p-0  ">
+    <a href="@Url.Action("Index", "UserManagement")" class="btn btn-info btn-md"> <b> Go to users</b>&nbsp;&nbsp;<i class="fas fa-users"></i></a>
+    <a href="@Url.Action("CreateRole")" class="btn btn-primary btn-md mr-0">
+        <b>Add Role</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+    </a>
+</div>
+
+<div  id="divRoles">
+
+</div>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+<script>
+    function loadRoles() {
+        $.ajax({
+            url: '@Url.Action("_RoleList")',
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#divRoles').html(response);
+                    $("#tblRoles").DataTable();
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        })
+    }
+
+    async function deleteRole(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to delete this role ?',
+            confirmButtonText: 'Delete',
+            confirmButtonClass: 'btn btn-danger',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeleteRole")/' + id,
+                method: 'DELETE',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadRoles();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to delete role',
+                        });
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+<script>
+    $(() => {
+        loadRoles();
+    });
+</script>

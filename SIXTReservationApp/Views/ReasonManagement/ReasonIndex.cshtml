@@ -1,0 +1,313 @@
+﻿@model SIXTReservationApp.Models.Reason.ReasonVM
+@{
+    ViewData["Title"] = "Reason Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="d-flex mb-2 mt-1 justify-content-end">
+    <button class="btn btn-primary btn-md mr-0" onclick="Create()">
+        <b>Add Reason</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+    </button>
+</div>
+<div class="ibox">
+    <div class="ibox-head">
+        <div class="ibox-title">Search</div>
+        <div class="ibox-tools">
+            <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+            <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+        </div>
+    </div>
+    <div class="ibox-body">
+        <form id="searchReason" class="form-horizontal">
+            <div class="form-group row">
+                <label class="col-4 col-form-label">Reason Name</label>
+                <label class="col-4 col-form-label">Reservation Status</label>
+                <label class="col-4 col-form-label">Category Status</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <input class="form-control" asp-for="Reason" type="text" placeholder="Name">
+                </div>
+                <div class="col-4">
+                    <select id="reservationStatusId" asp-for="ReservationStatus" class="mdb-select" Searchable="Search here...">
+                        <option class="default" value="" selected disabled>Select Reservation Status</option>
+                    </select>
+                </div>
+                <div class="col-4">
+                    <select asp-for="IsAnswer" class="mdb-select">
+                        <option class="default" selected disabled>Select Category Status</option>
+                        <option value="1">Answer</option>
+                        <option value="2">No Answer</option>
+                        <option value="3">None</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="form-group row">
+                <div class="col-12">
+                    <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                    <button type="button" id="resetBTN" onclick="clearForm(this)" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                        Cancel 
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="DivReason">
+
+</div>
+
+<!--Create Modal -->
+<div class="modal fade" id="CreateReasonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateReasonModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="resultCreate">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Edite Modal -->
+
+<div class="modal fade" id="editReasonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editReasonModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="result">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+<script>
+
+      async function loadReservation() {
+         $('#reservationStatusId').empty();
+         $('#reservationStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        $('#reservationStatusId').append(`<option value="${r.id}">${r.status}</option>`);
+                    });
+                }
+            }
+        });
+    }
+    function loadReasons(e) {
+        $('#CreateReasonModal').modal('hide'); $('#editReasonModal').modal('hide');
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#searchReason').serialize();
+        console.log(form);
+        $.ajax({
+            url: '@Url.Action("_ReasonList")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivReason').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+
+     async function deactivateReason(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to deactivate this reason?',
+            confirmButtonText: 'Ok',
+             showCancelButton: true,
+
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeactivateReason")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadReasons();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to deactivate Reason',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    async function activateReason(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to activate this reason?',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("ActivateReason")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadReasons();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to activate branch',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
+</script>
+
+@* create*@
+<script>
+
+    function Create() {
+
+        $.ajax({
+            url: '@Url.Action("CreateReason", "ReasonManagement")',
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                $('#resultCreate').html(data);
+                $('#CreateReasonModalTitle').text("Create Reason");
+                $('#CreateReasonModalTitle').css("text-align", "center");
+                $('#CreateReasonModal').modal('show');
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+
+    }
+
+</script>
+@*edit*@
+<script>
+
+    function Edit(id) {
+        $.ajax({
+            url: '@Url.Action("UpdateReason", "ReasonManagement")',
+            data: { id },
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                console.log(data);
+                $('#result').html('');
+                $('#resultCreate').html('');
+                 $('#result').html(data);
+                 $('#editReasonModalTitle').text("Update Reason");
+                $('#CreateReason').attr('action', '@Url.Action("UpdateReason")');
+              //  $("#RStatusId").val(data.);
+                 $('#btnSubmit').html('Update');
+                 $('#btnSubmit').removeClass("btn-primary");
+                 $('#btnSubmit').addClass("btn-success");
+                 $('#editReasonModal').modal('show');
+
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+    }
+
+</script>
+@*Delete*@
+<script>
+     async function Delete(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to delete this reason?',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeleteReason")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadReasons();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to Delete branch',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+<script>
+    $(() => {
+        loadReservation();
+        loadReasons();
+        $('#searchReason').on('submit', loadReasons);
+
+    })
+    function clearForm(e) {
+        $('#searchReason')[0].reset();
+        $('.default').prop('selected', true);
+        loadReasons();
+    }
+
+</script>
+
+
+
+
+

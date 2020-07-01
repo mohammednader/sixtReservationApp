@@ -1,0 +1,217 @@
+﻿@model SIXTReservationApp.Models.Notification.NotificationVM
+@{Layout = "_PartialLayout";}
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateNotification" method="post" asp-controller="NotificationManagement" asp-action="CreateNotification">
+
+                <input id="ReasonId" asp-for="Id" hidden />
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Reservation Status</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="RStatusId" asp-for="ReservationStatusId" class="mdb-select" onchange="loadStatusStep(this)" Searchable="Search here...">
+                            <option selected disabled>Select Reservation Status</option>
+                        </select>
+
+                        <span asp-validation-for="ReservationStatusId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus1" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Action Step</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="stepStatusId" asp-for="ActionStep" class="mdb-select" onchange="hideMSG()" Searchable="Search here...">
+                            <option selected disabled>Select Action Step</option>
+                        </select>
+
+                        <span asp-validation-for="ActionStep" class="text-danger"></span>
+                        <span id="MsgRequiredStatus2" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-12">
+                        <label><b>Job Title</b></label><span id="Redasterisks"> *</span>
+                    </div>
+                    <div class="col-12">
+                        <select id="jobTitles" asp-for="JobTitleId" class="mdb-select" onchange="hideMSG()" Searchable="Search here..." multiple="multiple">
+                            <option selected disabled>Select JobTitle</option>
+                        </select>
+
+                        <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                        <span id="MsgRequiredStatus3" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="check-list">
+                        <label class="ui-checkbox ui-checkbox-primary">
+                            <input id="checkDisable" type="checkbox" name="IsDisable" checked="" value="false">
+                            <span class="input-span"></span>Is Enable
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row form-group mt-2 ">
+                    <div class="col-12">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var GR_ReservationStatus = @Html.Raw(Json.Serialize(Model.ReservationStatusId));
+    var GR_ActionStep = @Html.Raw(Json.Serialize(Model.ActionStep));
+    var GR_JobTitleId = @Html.Raw(Json.Serialize(Model.JobTitleId));
+    var GR_IsDisable = @Html.Raw(Json.Serialize(Model.IsDisable));
+
+</script>
+@*button click*@
+<script>
+
+
+    $('#CreateNotification').ajaxForm(response => {
+
+        
+        if (!$('#RStatusId').val()) {
+            $("#MsgRequiredStatus1").css("display", "inline-block");
+        }
+        if (!$('#stepStatusId').val()) {
+            $("#MsgRequiredStatus2").css("display", "inline-block");
+        }
+        if (GR_JobTitleId==null)
+        {
+            $("#MsgRequiredStatus3").css("display", "inline-block");
+        }
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadNotification();
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+     async function loadReservationStatus() {
+         $('#RStatusId').empty();
+         $('#RStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.status}</option>`);
+
+                        $('#RStatusId').append(node);
+                    });
+                }
+                if (@Model.Id> 0)
+                {
+                    $('#RStatusId').val(GR_ReservationStatus);
+                    loadStatusStep();
+                }
+                $('#RStatusId').materialSelect();
+                $('#stepStatusId').materialSelect();
+
+            }
+        });
+    }
+
+ async function loadStatusStep(RId)
+ {
+     if ($('#RStatusId').val())
+     {
+         $("#MsgRequiredStatus1").css("display", "none");
+     }
+        $('#stepStatusId').empty();
+        $('#stepStatusId').append('<option class="default" value="" selected disabled>Select Action Step</option>');
+
+         var Id = $('#RStatusId').val();
+
+        $.ajax({
+            url: '@Url.Action("GetReservationStep", "Common")',
+            method: 'GET',
+            data: {Id},
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option  value=${r.id} >${r.step}</option>`);
+
+                        $('#stepStatusId').append(node);
+                    });
+                }
+                $('#stepStatusId').val(GR_ActionStep);
+                $('#stepStatusId').materialSelect();
+            }
+        });
+    }
+
+    async function loadJobTitle() {
+        $('#jobTitles').empty();
+        $('#jobTitles').append('<option class="default" value="" selected disabled>Select Job Title</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllJobTitles", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#jobTitles').append(node);
+                    });
+                }
+                $('#jobTitles').val(GR_JobTitleId);
+                $('#jobTitles').materialSelect();
+
+            }
+        });
+    }
+
+
+
+    $(() => {
+        loadReservationStatus();
+        loadJobTitle();
+
+    })
+
+    function hideMSG()
+    {
+        if ($('#RStatusId').val()) {
+            $("#MsgRequiredStatus1").css("display", "none");
+        }
+        if ($('#stepStatusId').val()) {
+            $("#MsgRequiredStatus2").css("display", "none");
+        }
+        if ($('#jobTitles').val()) {
+            $("#MsgRequiredStatus3").css("display", "none");
+        }
+    }
+
+</script>

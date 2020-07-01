@@ -1,0 +1,104 @@
+﻿@model List<SIXTReservationApp.Models.UserManagement.UserVM>
+
+<div class="fade-in-up">
+    <div class="ibox">
+        <div class="ibox-head">
+            <div class="ibox-title">Users List</div>
+        </div>
+        <div class="ibox-body">
+            <table class="table table-striped table-bordered table-hover" id="UserTable" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th data-sortable="true">Name</th>
+                        <th  data-sortable="false">Email</th>
+                        <th data-sortable="false" style="width:150px;">Phone</th>
+                        <th data-sortable="false">Role(s)</th>
+                        <th data-sortable="true">Branch</th>
+                        <th data-sortable="true">Job Title</th>
+                        <th data-sortable="true" class="text-center">Active</th>
+                        <th data-sortable="false" style="width:150px;" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Count > 0)
+                    {
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td><b>@item.Name</b></td>
+                                <td>@item.Email</td>
+                                <td>@item.PhoneNumber</td>
+                                <td>@item.Roles</td>
+                                <td>@item.Branch</td>
+                                <td>@item.JobTitle</td>
+                                <td class="text-center">
+
+
+                                    @if (item.IsActive)
+                                    {
+                                        <span style="display:none">a</span>
+                                        <i title="Active" class="fa fa-check text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <span style="display:none">b</span>
+                                        <i title="InActive" class="fa fa-times text-danger"></i>
+                                    }
+                                </td>
+
+                                <td >
+                                    <button class="material-tooltip-main btn btn-info btn-floating btn-sm m-0 mr-1 p-0" data-toggle="tooltip" title="Reset Password" onclick="resetPassword(@item.Id)">
+                                            <i class="fas fa-key"></i>
+                                    </button>
+
+                                    <a href="@Url.Action("UpdateUser", new { Id = item.Id })" class="material-tooltip-main btn-primary btn btn-floating btn-sm p-0 m-0" data-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    @if (item.IsActive)
+                                    {
+                                        <button class="material-tooltip-main btn btn-danger btn-floating btn-sm m-0 ml-1 p-0 " data-toggle="tooltip" title="Deactivate" onclick="deactivateUser(@item.Id)">
+                                            <i class="fas fa-lock"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="material-tooltip-main btn btn-success btn-floating btn-sm m-0 ml-1 p-0" data-toggle="tooltip" title="Activate" onclick="activateUser(@item.Id)">
+                                            <i class="fas fa-lock-open"></i>
+                                        </button>
+
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">No users found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        @*var count = @Html.Raw(Model?.Count);
+        if (count) {
+
+            $("#UserTable").DataTable({
+                "ordering": true
+
+            });
+        } else {
+
+        }
+
+        $(function () {
+            $('.material-tooltip-main').tooltip();
+        })
+    })*@
+</script>
+

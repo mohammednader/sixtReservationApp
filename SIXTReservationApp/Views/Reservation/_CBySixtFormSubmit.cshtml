@@ -1,0 +1,59 @@
+﻿@model SIXTReservationApp.Models.CByCustomerReservation.FormSubmitVM
+
+<div>
+    <form id="formSubmit">
+   
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Reason</b></label>
+                <select id="reasonDDL" asp-for="@Model.ReasonId" class="form-control validate" required>
+                    <option selected disabled>Select Reason</option>
+                </select>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-6  form-group">
+                <label><b>Comment</b></label>
+                <textarea id="comment" asp-for="@Model.Comment" class="form-control" placeholder="Comment here .." required />
+            </div>
+        </div>
+
+        <div class="ml-1">
+            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light ml-5" onclick="formSubmit()">Submit</button>
+        </div>
+    </form>
+</div>
+<script>
+    $(() => {
+        LoadReason();
+
+    })
+
+  function LoadReason()
+    {
+      $('#reasonDDL').empty();
+      $('#reasonDDL').append('<option selected disabled > select Reason</option>');
+      var isAnswer = $('#statusDDL').val();
+      console.log(isAnswer);
+        $.ajax({
+            url: '@Url.Action("GetReasonForCBySixt", "Reservation")',
+            method: 'GET',
+            data: { isAnswer},
+            success: response => {
+                console.log(response);
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id}>${r.name}</option>`);
+                        $('#reasonDDL').append(node);
+                    });
+                }
+
+
+            }
+        });
+    }
+
+
+
+</script>
+

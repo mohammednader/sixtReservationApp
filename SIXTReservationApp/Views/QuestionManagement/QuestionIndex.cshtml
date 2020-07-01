@@ -1,0 +1,279 @@
+﻿@model SIXTReservationApp.Models.Question.QuestionVM
+@{
+    ViewData["Title"] = "Question Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+         <div class="d-flex mb-2   justify-content-end">
+            <button class="btn btn-primary btn-md mr-0" onclick="Create()">
+                <b>Add Question</b>&nbsp;&nbsp;<i class="fas fa-plus"></i>
+            </button>
+        </div>
+        <div class="ibox">
+            <div class="ibox-head">
+                <div class="ibox-title">Search</div>
+                <div class="ibox-tools">
+                    <a class="ibox-collapse"><i class="fa fa-minus"></i></a>
+                    <a class="fullscreen-link"><i class="fa fa-expand"></i></a>
+                </div>
+            </div>
+            <div class="ibox-body">
+                <form id="searchQuestion" class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="col-4 col-form-label font-weight-bold">Question Text</label>
+                       @* <label class="col-4 col-form-label font-weight-bold">Reservation Status</label>*@
+                        <label class="col-4 col-form-label font-weight-bold">Action Step</label>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-4">
+                            <input class="form-control" asp-for="QuestionText" type="text" placeholder="Name">
+                        </div>
+                        @*<div class="col-4">
+                            <select id="reservationStatusId" asp-for="ReservationStatus" class="mdb-select" Searchable="Search here...">
+                                <option class="default" value="" selected disabled>Select Reservation Status</option>
+                            </select>
+                        </div>*@
+                        <div class="col-4">
+                            <select id="ActionStatusId" asp-for="ActionStep" class="mdb-select">
+                                <option class="default" selected>None</option>
+                            </select>
+                        </div>   
+                        <div class="col-4">
+                            <button class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Search</button>
+                            <button type="button" id="resetBTN" onclick="clearForm(this)" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+ 
+                </form>
+            </div>
+        </div>
+     <div id="DivQuestion">
+
+
+    </div>
+ <!--Create Modal -->
+<div class="modal fade" id="CreateQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CreateQuestionModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="col-12">
+
+            <div id="resultCreate">
+
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!--Edite Modal -->
+
+<div class="modal fade" id="editQuestionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editQuestionModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="result">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+      @*async function loadReservation() {
+         $('#reservationStatusId').empty();
+         $('#reservationStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetAllReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        $('#reservationStatusId').append(`<option value="${r.id}">${r.status}</option>`);
+                    });
+                }
+            }
+        });
+    }*@
+    function loadActionStep() {
+        $('#ActionStatusId').empty();
+        $('#ActionStatusId').append('<option class="default" value="" selected disabled>Select Action Step</option>');
+
+        var Id = 5; //invoiced
+
+        $.ajax({
+            url: '@Url.Action("GetReservationStep", "QuestionManagement")',
+            method: 'GET',
+            data: {Id},
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.step}</option>`);
+                        $('#ActionStatusId').append(node);
+                    });
+                }
+                //$('#ActionStatusId').materialSelect();
+
+
+            }
+        });
+    }
+    function loadQuestions(e) {
+        $('#CreateQuestionModal').modal('hide'); $('#editQuestionModal').modal('hide');
+        if (e) {
+            e.preventDefault();
+            e.returnValue = false;
+        }
+
+        var form = $('#searchQuestion').serialize();
+        console.log(form);
+        $.ajax({
+            url: '@Url.Action("_QuestionList")?' + form,
+            method: 'GET',
+            success: response => {
+                if (response) {
+                    $('#DivQuestion').html(response);
+                    $('#example-table').dataTable();
+                }
+                else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Failed to load roles',
+                    });
+                }
+            }
+        });
+    }
+
+
+
+</script>
+
+@* create*@
+<script>
+
+    function Create() {
+
+        $.ajax({
+            url: '@Url.Action("CreateQuestion", "QuestionManagement")',
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                $('#resultCreate').html(data);
+                $('#CreateQuestionModalTitle').text("Create Question");
+                $('#CreateQuestionModalTitle').css("text-align", "center");
+                $('#CreateQuestionModal').modal('show');
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+
+    }
+
+</script>
+@*edit*@
+<script>
+
+    function Edit(id) {
+        $.ajax({
+            url: '@Url.Action("UpdateQuestion", "QuestionManagement")',
+            data: { id },
+            type: "Get",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                console.log(data);
+                $('#result').html('');
+                $('#resultCreate').html('');
+                $('#result').html(data);
+                // Model Binding with data 
+                $("#RStatusId").val(GR_ReservationStatus);
+                $('#questionTextId').val(GR_Question);
+                
+
+                 $('#editQuestionModalTitle').text("Update Question");
+                $('#CreateQuestion').attr('action', '@Url.Action("UpdateQuestion")');
+                 $('#btnSubmit').html('Update');
+                 $('#btnSubmit').removeClass("btn-primary");
+                 $('#btnSubmit').addClass("btn-success");
+                 $('#editQuestionModal').modal('show');
+
+            },
+            error: function (x) {
+                alert("error" + x);
+            },
+        });
+    }
+
+</script>
+@*Delete*@
+<script>
+     async function Delete(id) {
+        var confirm = await Swal.fire({
+            icon: 'question',
+            text: 'Are you sure you want to delete this question?',
+            showCancelButton: true,
+        });
+        if (confirm && confirm.value) {
+            $.ajax({
+                url: '@Url.Action("DeleteQuestion")/' + id,
+                method: 'Post',
+                success: response => {
+                    if (response && response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message,
+                        });
+                        loadQuestions();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: (response && response.message) ? response.message : 'Failed to Delete Question',
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+<script>
+    $(() => {
+       // loadReservation();
+        loadQuestions();
+        loadActionStep();
+        $('#searchQuestion').on('submit', loadQuestions);
+
+    })
+    function clearForm(e) {
+        $('#searchQuestion')[0].reset();
+        $('.default').prop('selected', true);
+        loadQuestions();
+    }
+
+</script>
+
+
+
+
+

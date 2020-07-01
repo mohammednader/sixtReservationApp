@@ -1,0 +1,93 @@
+﻿#login-form {
+    -webkit-box-shadow: -4px 9px 18px -4px rgba(0,0,0,0.2);
+}
+
+.tab-content.profile {
+    padding-top: 0.1rem;
+}
+
+.dropdown-menu.dropdown-menu-right.dropdown-menu-media.show {
+    position: fixed !important;
+    right: 0 !important;
+    top:-3px !important;
+    height: 100vh;
+    left: unset !important;
+    transform: unset !important;
+}
+.scroller, .slimScrollDiv {
+    height: 100% !important;
+}      
+
+/** change datatable padding **/
+table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead .sorting_desc_disabled:after {
+    bottom: 0.5em !important;
+}
+ table.table td {
+    padding-top: 0.3rem !important;
+     padding-bottom: 0.3rem !important;  
+}
+table.table th {
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+}
+.table th, .table td {
+    padding: 0.5rem !important;
+
+}
+
+.show .badge {
+    box-shadow: none !important;
+}
+.ibox{
+    box-shadow:none !important;
+}
+.fullscreen-link{
+    display:none !important;
+}
+
+.NotificationBar .badge{
+    box-shadow:none;
+}
+
+.NotificationBar .media-body{
+    margin-top:4px;
+    color:black;
+}
+
+.custom-control { 
+    padding-left: 1.8rem !important;
+}
+
+
+/*sidebar notifications*/
+.NotificationBar {
+    height: 101vh;
+    margin-top: -3px;
+    width: 14.0vw;
+    background-color: white;
+    position: fixed;
+    right: 0;
+    transition: 0.3s all ease-in-out;
+}
+
+    .NotificationBar .ibox .ibox-head {
+        padding: 0 !important;
+        height: 32px;
+        /*border-top: 1px solid #eeeeee;*/
+    }
+
+    .NotificationBar .ibox .ibox-body {
+        padding: 2px 0px;
+        background-color: cyan;
+    }
+
+.DisNone {
+    display: none;
+}
+.navbar-toolbar .badge{
+    box-shadow:none !important;
+}
+
+.btn{
+    box-shadow:none !important;
+}

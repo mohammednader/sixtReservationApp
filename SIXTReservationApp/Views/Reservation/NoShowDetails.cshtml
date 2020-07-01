@@ -1,0 +1,286 @@
+﻿@model SIXTReservationApp.Models.VReservationListVM
+
+@{
+    ViewData["Title"] = "No Show Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@if (Model != null)
+{
+    <div class="ibox mt-2">
+        <div class="ibox-head"><h4>Reservation @Model.ReservationNum Details</h4></div>
+        <div class="ibox-body">
+            <div class="row">
+                <div class="col-6">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="d-none">
+                                <th scope="col">Number Of Reservations</th>
+                                <th scope="col">First</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Number Of Reservations</th>
+                                <td>@Html.DisplayFor(model => model.NumberOfReservations)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Booking Date</th>
+                                <td>@Html.DisplayFor(model => model.BookingDate)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Hour</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.ReservationHour)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">PickUp Date</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.PickUpDate)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">PickUp Hour</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.PickUpHour)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">PickUp Week Day</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.PickUpweekDay)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Revenue Eur</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RevenueEur)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Revenue Per Day Eur</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RevenuePerDayEur)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Rental Days</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RentalDays)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Lead Time In Days</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.LeadTimeInDays)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Cancelled After Booking In Days</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.CancelledAfterBookingInDays)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Cancelled Before PickUp In Days</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.CancelledBeforeBickUpInDays)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">PickUp Branch</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.PickUpBranchName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Drop Off Date</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.DropOffDate)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Drop Off Hour</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.DropOffHour)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Drop Off week Day</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.DropOffweekDay)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Vehicle Acriss</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.VehicleAcriss)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Source Channel1</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.ReservationSourceChannel1)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Source Channel2</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.ReservationSourceChannel2)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Source Channel3</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.ReservationSourceChannel3)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">RateSegment Name</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RateSegmentName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">RateSegment Category</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.RateSegmentCategoryName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Rate Segment SubCategory</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.RateSegmentSubCategory)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Point Of Sale</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.ReservationPointOfSale)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-6">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="d-none">
+                                <th scope="col">Number Of Reservations</th>
+                                <th scope="col">First</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">One Way Reservation </th>
+                                <td>
+                                    @if (Model.OneWayReservation.HasValue)
+                                    {
+                                        if (Model.OneWayReservation.Value)
+                                        {
+                                            <sapn>True</sapn>
+                                        }
+                                        else
+                                        {
+                                            <sapn>False</sapn>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">On Request</th>
+                                <td>
+                                    @if (Model.OnRequest.HasValue)
+                                    {
+                                        if (Model.OnRequest.Value)
+                                        {
+                                            <sapn>True</sapn>
+                                        }
+                                        else
+                                        {
+                                            <sapn>False</sapn>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Request Level</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RequestLevel)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Agent</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.ReservationAgent)</td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Reservation Status</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.ReservationStatus)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Cancelled Date</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.CancelledDate)</td>
+                            </tr>
+
+
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Rental Agreement Number</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.RentalAgreementNumber)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Prepaid</th>
+                                <td colspan="2">
+                                    @if (Model.Prepaid.HasValue)
+                                    {
+                                        if (Model.Prepaid.Value)
+                                        {
+                                            <sapn>True</sapn>
+                                        }
+                                        else
+                                        {
+                                            <sapn>False</sapn>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Converted To Rental</th>
+                                <td colspan="2">
+                                    @if (Model.ConvertedToRental.HasValue)
+                                    {
+                                        if (Model.ConvertedToRental.Value)
+                                        {
+                                            <sapn>True</sapn>
+                                        }
+                                        else
+                                        {
+                                            <sapn>False</sapn>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">No Show Date</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.NoShowDate)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Cd Number</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.Cdnumber)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Customer Name</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.CustomerName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Driver Name</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.DriverName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Driver Country</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.DriverCountry)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Customer Card Indicator</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.CustomerCardIndicator)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Agency Country</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.AgencyCountry)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Agency Subsidiary Name</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.AgencySubsidiaryName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Agency Parent Name</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.AgencyParentName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Business Segment</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.BusinessSegmentText)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Creation Date</th>
+                                <td colspan="2"> @Html.DisplayFor(model => model.CreationDate)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Assigned To Name</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.AssignedToName)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Next Step</th>
+                                <td colspan="2">@Html.DisplayFor(model => model.NextStep)</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+}

@@ -1,0 +1,152 @@
+﻿@model SIXTReservationApp.Models.RoleManagement.RoleDto
+
+@{
+    ViewData["Title"] = ViewBag.Title;
+}
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<form asp-action="CreateRole" method="post" id="formRole">
+    <div class="card card-body mt-2">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" id="hfPermissions" name="SelectedPermissions" />
+        <div class="row">
+            <div class="col-sm-4 form-group">
+                <label asp-for="Name" class="control-label"></label><span id="Redasterisks"> *</span>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-sm-6">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <span class="text-danger" id="errModel"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-body mt-3">
+        <div>
+            <h4>Permissions associated to role</h4>
+        </div>
+        <div>
+            <div id="jstree-permissions" class="rounded border-dark" style="max-height:400px; overflow:auto; background-color:#fafafa; padding:30px;"></div>
+        </div>
+        <div class="text-right mt-3">
+            <button type="button" class="btn btn-link"><a href="@Url.Action("RoleIndex", "RoleManagement")">Back to list</a></button>
+            <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    var PERMISSIONS = [];
+
+    function initJsTree(data) {
+        $('#jstree-permissions')
+            .jstree({
+                "core": {
+                    "animation": 0,
+                    "check_callback": true,
+                    'force_text': true,
+                    "themes": { "": true },
+                    'data': data
+                },
+                "types": {
+                    "#": { "max_children": 1, "max_depth": 4, "valid_children": ["root"] },
+                    "root": { "icon": "", "valid_children": ["default"] },
+                    "default": { "icon": "fas fa-file text-primary", "valid_children": ["default", "file"] },
+                    "file": { "icon": "", "valid_children": [] }
+                },
+                "plugins": ["types", "wholerow", "checkbox"]
+            }).on('changed.jstree', function (e, data) {
+                if (data.selected.length) {
+                    $('#hfPermissions').val(data.selected.join(','));
+                } else {
+                    $('#hfPermissions').val('');
+                }
+            });
+    }
+
+
+    function getPermissions() {
+        var roleId = @Html.Raw(Json.Serialize(Model?.Id));
+        $.ajax({
+            url: `@Url.Action("GetAllPermissions")?roleId=${roleId}`,
+            method: 'GET',
+            success: response => {
+                if (response && response.success && response.data) {
+                    initJsTree(response.data);
+                    PERMISSIONS = response.data;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        text: response.message,
+                    });
+                }
+            }
+        });
+    }
+
+
+</script>
+
+<script>
+    $(() => {
+        @if (Model?.Id > 0)
+        {
+            <text>$('#formRole').attr('action', '@Url.Action("UpdateRole")')</text>
+        }
+
+        getPermissions();
+
+        $('#DefaultPageId').on('change', e => {
+            if ($('#DefaultPageId').val()) {
+                $('#errDDL').text('');
+            }
+        });
+
+        $('#formRole').ajaxForm(response => {
+            $('#errModel').text('');
+            $('#errDDL').text('');
+            if (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        text: response.message,
+                    }).then(_ => {
+                        location.href = '@Url.Action("RoleIndex")';
+                    });
+                }
+                else {
+                    if (response.modelMessage) {
+                        $('#errModel').text(response.modelMessage);
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message,
+                        });
+                    }
+                }
+            }
+            else {
+                /*if (!$('#DefaultPageId').val()) {
+                    $('#errDDL').text('This field is required');
+                }*/
+            }
+        });
+    });
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

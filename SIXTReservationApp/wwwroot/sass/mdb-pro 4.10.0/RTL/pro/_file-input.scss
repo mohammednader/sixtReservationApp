@@ -1,0 +1,45 @@
+// File Input
+.file-field {
+    position: relative;
+
+    .file-path-wrapper {
+        height: $file-path-wrapper-height;
+        @include padding-left( $file-path-wrapper-padding-left);
+        overflow: hidden;
+    }
+
+    input {
+        &.file-path {
+            width: 100%;
+            // height: $file-input-path;
+            height: 36px;
+        }
+    }
+
+    .btn {
+        @include float( left);
+    }
+
+    span {
+        @include cursor( pointer);
+    }
+
+    input[type="file"] {
+        // Needed to override webkit button
+        &::-webkit-file-upload-button {
+            display: none;
+        }
+
+        position: absolute;
+        top: 0;
+        @include right( 0);
+        bottom: 0;
+        @include left( 0);
+        width: 100%;
+        @include padding( 0);
+        @include margin( 0);
+        @include cursor( pointer);
+        filter: $file-input-filter;
+        opacity: 0;
+    }
+}

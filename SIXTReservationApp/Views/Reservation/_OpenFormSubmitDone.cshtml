@@ -1,0 +1,66 @@
+﻿@model List<SIXTReservationApp.Models.CByCustomerReservation.UserFormSubmit>
+
+<div>
+    @if (Model?.Count > 0)
+    {
+        <div class="row">
+            <!-- step conetnt -->
+            <div class="md-form col-6 m-5">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <td class="font-weight-bold">Created User</td>
+                            <td class="font-weight-bold">creation Date</td>
+                            <td class="font-weight-bold">Status</td>
+                            <td class="font-weight-bold">Reason Status</td>
+                            <td class="font-weight-bold">Reason</td>
+                            <td class="font-weight-bold">Comment</td>
+                        </tr>
+                    </thead>
+
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+
+                        var item = Model[i];
+                <tr>
+                    <td>@item.User</td>
+                    <td>@item.Date</td>
+                    @if (item.IsConfirmed == true)
+                    {
+                        <td>Confirmed</td>
+                    }
+                    else
+                    {
+                        <td>Cancelled</td>
+                    }
+                    @if (item.AnswerStatus == true)
+                    {
+                        <td>Answer</td>
+                    }
+                    else if (item.AnswerStatus == false)
+                    {
+                        <td>No Answer</td>
+                    }
+                    else
+                    {
+                        <td> </td>
+                    }
+
+                    <td>@item.ReasonText</td>
+                    <td>@item.Comment</td>
+                </tr>
+                    }
+
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+
+    }
+</div>
+<script>
+    $('#step_3').removeClass("active");
+    $('#step_3').addClass("done");
+</script>

@@ -1,0 +1,137 @@
+﻿@model SIXTReservationApp.Models.Question.QuestionVM
+@{Layout = "_PartialLayout";
+        
+    }
+
+<style>
+    #Redasterisks {
+        color: red;
+    }
+</style>
+<!-- START PAGE CONTENT-->
+<div class="page-content fade-in-up">
+    <div class="ibox">
+        <div class="ibox-body">
+            <form id="CreateQuestion" method="post" asp-controller="QuestionManagement" asp-action="CreateQuestion">
+                <div class="row">
+                    <input id="ReasonId" asp-for="Id" hidden />
+                    <div class="col-12 form-group">
+                        <label><b>Reservation Status</b></label><span id="Redasterisks"> *</span>
+
+                        <select id="RStatusId" asp-for="ReservationStatus" class="form-control select2_demo_1"  Searchable="Search here...">
+                            <option selected disabled>Select Reservation Status</option>
+                        </select>
+
+                        <span asp-validation-for="ReservationStatus" class="text-danger"></span>
+                        <span id="MsgRequiredStatus" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+                    <div class="col-sm-12 form-group">
+                        <label><b>Question Text</b></label><span id="Redasterisks"> *</span>
+                        <textarea id="questionTextId" asp-for="QuestionText" class="form-control" placeholder="Question text here .." required />
+                        <span asp-validation-for="QuestionText" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <label><b>Action Step</b></label><span id="Redasterisks"> *</span>
+                        <select id="stepStatusId" asp-for="ActionStep" class="mdb-select" onchange="changeStatus()" Searchable="Search here...">
+                            <option selected disabled>Select Action Step</option>
+                        </select>
+
+                        <span asp-validation-for="ActionStep" class="text-danger"></span>
+                        <span id="MsgRequiredStatus" class="text-danger" style="display:none;">This field is required</span>
+                    </div>
+                   
+                    <div class="col-12 form-group mt-2">
+                        <button id="btnSubmit" class="btn btn-primary btn-md mr-0 float-right waves-effect waves-light" type="submit">Add</button>
+                        <button id="btnCancel" class="btn btn-secondary btn-md mr-0 float-right waves-effect waves-light" type="reset" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var GR_ReservationStatus = @Html.Raw(Json.Serialize(Model.ReservationStatus));
+    var GR_ActionStep = @Html.Raw(Json.Serialize(Model.ActionStep));
+    var GR_Question = @Html.Raw(Json.Serialize(Model.QuestionText));
+
+</script>
+@*button click*@
+<script>
+
+
+    $('#CreateQuestion').ajaxForm(response => {
+        if (response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message || "Failed",
+                }).then(_ => {
+                    loadQuestions()
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message || "Failed",
+                });
+
+            }
+        }
+    });
+
+     async function loadReservationStatus() {
+         $('#RStatusId').empty();
+         //$('#RStatusId').append('<option class="default" value="" selected disabled>Select Reservation Status</option>');
+
+        $.ajax({
+            url: '@Url.Action("GetInvocedReservationStatus", "Common")',
+            method: 'GET',
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                       var node = $(`<option value=${r.id} selected >${r.status}</option>`);
+                        $('#RStatusId').append(node);
+                      
+                    });
+                }
+                loadStatusStep();
+            }
+        });
+    }
+
+      function loadStatusStep() {
+         $('#stepStatusId').empty();
+         var Id = $('#RStatusId').val();
+        
+        $.ajax({
+            url: '@Url.Action("GetReservationStep", "Common")',
+            method: 'GET',
+            data: {Id},
+            success: response => {
+                if (response && response.length) {
+                    response.forEach(r => {
+                        var node = $(`<option value=${r.id} >${r.step}</option>`);
+                        $('#stepStatusId').val(GR_ActionStep);
+                        $('#stepStatusId').append(node);
+                    });
+                }
+                $('#stepStatusId').materialSelect();
+
+
+            }
+        });
+    }
+
+    function changeStatus() {
+        $("#MsgRequiredStatus").css("display", "none");
+    }
+
+    $(() => {
+        //$('#actionStepId').materialSelect();
+        loadReservationStatus();
+    })
+
+</script>
